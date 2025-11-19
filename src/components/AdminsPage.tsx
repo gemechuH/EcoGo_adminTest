@@ -46,22 +46,30 @@ interface UserData {
 
 interface RideData {
   id: string;
-  pickup: string;
-  destination: string;
-  name: string;
-  fare: number;
-  status: string;
-  riderId: string;
-  driverId: string;
+  pickup?: string;
+  destination?: string;
+  name?: string;
+  fare?: number;
+  status?: string;
+  riderId?: string;
+  driverId?: string;
+  [key: string]: any;
 }
 
 interface AdminData {
+  id: string;
   name?: string;
   email?: string;
   role?: string;
+  status?: string;
+  createdAt?: any;
+  lastLogin?: string;
+  [key: string]: any;
+  phone?: string;
 }
 
-const mockAdmins: Users[] = [
+
+const mockAdmins: AdminData[] = [
   {
     id: "1",
     name: "John Admin",
@@ -101,7 +109,7 @@ const mockAdmins: Users[] = [
 ];
 
 export function AdminsPage() {
-  const [admins, setAdmins] = useState<Users[]>(mockAdmins);
+const [admins, setAdmins] = useState<AdminData[]>(mockAdmins);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const router = useRouter();
@@ -210,12 +218,15 @@ export function AdminsPage() {
     const formData = new FormData(e.currentTarget);
     const newAdmin: User = {
       id: `${admins.length + 1}`,
-      name: formData.get("name") as string,
+      firstName: formData.get("firstName") as string,
+      lastName: formData.get("lastName") as string,
       email: formData.get("email") as string,
+      mobile: formData.get("mobile") as string,
       role: "admin",
-      status: "active",
-      createdAt: new Date().toISOString().split("T")[0],
+      
+      createdAt: new Date(),
     };
+
     setAdmins([...admins, newAdmin]);
     setIsAddDialogOpen(false);
     toast.success("Admin added successfully!");

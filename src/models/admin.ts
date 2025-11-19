@@ -7,6 +7,7 @@ export interface User {
   role: "admin" | "operator";
   canOverride?: boolean; // optional, only relevant for admins
   createdAt: Date;
+  phone?: string;
 }
 
 export const createUserData = (data: Omit<User, "createdAt">): User => ({
