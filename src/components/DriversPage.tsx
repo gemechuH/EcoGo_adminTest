@@ -45,6 +45,8 @@ import {
   TrendingUp,
   Calendar,
   DollarSign,
+  WifiOff,
+  Wifi,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -207,20 +209,27 @@ export function DriversPage() {
   };
 
   const stats = [
-    { label: "Total Drivers", value: drivers.length },
+    { label: "Total Drivers", value: drivers.length, icon: UserPlus },
     {
       label: "Active Now",
       value: drivers.filter((d) => d.status === "active").length,
+      icon: TrendingUp,
     },
     {
       label: "On Trip",
       value: drivers.filter((d) => d.status === "on-trip").length,
+      icon: Calendar,
     },
     {
       label: "Offline",
       value: drivers.filter((d) => d.status === "offline").length,
+      icon: WifiOff,
     },
-    { label: "Online", value: drivers.filter((d) => d.active).length },
+    {
+      label: "Online",
+      value: drivers.filter((d) => d.active).length,
+      icon: Wifi,
+    },
   ];
   const totalRevenue = drivers.reduce((sum, driver) => sum + driver.rating, 0);
   const totalTrips = drivers.reduce(
@@ -266,7 +275,7 @@ export function DriversPage() {
           <div>
             <h1
               style={{ color: "var(--charcoal-dark)" }}
-              className="font-bold text-4xl"
+              className="font-bold text-3xl"
             >
               Drivers Dashboard
             </h1>
@@ -389,14 +398,24 @@ export function DriversPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {stats.map((stat) => (
-            <Card key={stat.label} className="bg-white border-none shadow-md">
-              <CardContent className="pt-6">
-                <h3 style={{ color: "#2DB85B" }}>{stat.value}</h3>
-                <p style={{ color: "#2D2D2D" }}>{stat.label}</p>
-              </CardContent>
-            </Card>
-          ))}
+          {stats.map((stat) => { 
+            const Icon = stat.icon;
+            return (
+              <Card key={stat.label} className="bg-white border-none shadow-md">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div
+                      className="w-8 h-10 rounded-lg flex items-center justify-center"
+                      
+                    >
+                      <Icon className="w-5 h-5" style={{ color: "#2DB85B" }} />
+                    </div>
+                    <h3 style={{ color: "#2D2D2D" }}>{stat.value}</h3>
+                  </div>
+                  <p style={{ color: "#2D2D2D" }}>{stat.label}</p>
+                </CardContent>
+              </Card>
+            );})}
         </div>
 
         <Card className="bg-white border-none shadow-md rounded-lg h-10">
@@ -461,7 +480,7 @@ export function DriversPage() {
 
                   <div
                     className="flex items-center gap-2 p-3 rounded-lg"
-                    style={{ backgroundColor: "#D0F5DC" }}
+                    style={{ backgroundColor: "#d3d3d3" }}
                   >
                     <Car className="w-4 h-4" style={{ color: "#2DB85B" }} />
                     <div className="flex-1">

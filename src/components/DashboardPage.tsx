@@ -65,7 +65,7 @@ export function DashboardPage() {
         <div>
           <h1
             style={{ color: "var(--charcoal-dark)" }}
-            className="font-bold text-4xl"
+            className="font-bold text-3xl"
           >
             Dashboard
           </h1>

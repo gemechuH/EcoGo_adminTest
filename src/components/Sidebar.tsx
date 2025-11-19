@@ -125,10 +125,12 @@ export function Sidebar({
                       type="checkbox"
                       checked={isUserMenuExpanded}
                       onChange={(e) => setIsUserMenuExpanded(e.target.checked)}
-                      className="accent-[#2DB85B] w-4 h-4"
+                      className="accent-[#2DB85B] w-4 h-4 cursor-pointer"
                       aria-label="Toggle Users section"
                     />
-                    <span className="flex-1 text-left">{item.label}</span>
+                    <span className="flex-1 text-left cursor-pointer">
+                      {item.label}
+                    </span>
                   </div>
                   {showUsersMenu && (
                     <div className="ml-4 mb-2 space-y-1">
@@ -158,7 +160,7 @@ export function Sidebar({
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-colors cursor-pointer"
                 style={{
                   backgroundColor: "transparent",
                   color: "white",

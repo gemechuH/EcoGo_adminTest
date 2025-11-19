@@ -382,22 +382,19 @@ export function RidersPage() {
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3 mb-2">
                     <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: "#D0F5DC" }}
+                      className="w-8 h-10 rounded-lg flex items-center justify-center"
+                      
                     >
                       <Icon className="w-5 h-5" style={{ color: "#2DB85B" }} />
                     </div>
                     <h3
-                      style={{
-                        color: "#000000",
-                        fontWeight: "bold",
-                        fontSize: "24px",
-                      }}
+                     
+                      style={{ color: "#2D2D2D" }}
                     >
                       {stat.value}
                     </h3>
                   </div>
-                  <p className="mt-6  text-lg" style={{ color: "#2D2D2D" }}>
+                  <p className="mt-6" style={{ color: "#2D2D2D" }}>
                     {stat.label}
                   </p>
                 </CardContent>
