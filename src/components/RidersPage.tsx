@@ -274,7 +274,7 @@ export function RidersPage() {
       <div className="p-6 space-y-6 ">
         <div className="flex items-center justify-between">
           <div>
-            <h1 style={{ color: "#2F3A3F" }} className="font-bold text-4xl">
+            <h1 style={{ color: "#2F3A3F" }} className="font-bold text-3xl">
               Riders Dashboard
             </h1>
             <p style={{ color: "#2D2D2D" }} className="text-lg">
@@ -371,7 +371,7 @@ export function RidersPage() {
           </Dialog>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 w-full h-35 gap-32">
+        <div className="grid grid-cols-1 md:grid-cols-4 w-full h-35 gap-5">
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
@@ -391,16 +391,13 @@ export function RidersPage() {
                       style={{
                         color: "#000000",
                         fontWeight: "bold",
-                        fontSize: "28px",
+                        fontSize: "24px",
                       }}
                     >
                       {stat.value}
                     </h3>
                   </div>
-                  <p
-                    className="mt-6 font-bold text-xl"
-                    style={{ color: "#2D2D2D" }}
-                  >
+                  <p className="mt-6  text-lg" style={{ color: "#2D2D2D" }}>
                     {stat.label}
                   </p>
                 </CardContent>
@@ -430,8 +427,8 @@ export function RidersPage() {
             <CardTitle>All Riders</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="w-full overflow-x-auto">
+              <table className="w-full min-w-[900px]">
                 <thead>
                   <tr
                     style={{ borderBottomWidth: "1px", borderColor: "#E6E6E6" }}
@@ -447,92 +444,91 @@ export function RidersPage() {
                     <th className="text-right p-4">Actions</th>
                   </tr>
                 </thead>
+
                 <tbody>
-                  {filteredRiders.map((rider, index) => {
-                    const statusColor = getStatusColor(rider.status);
-                    return (
-                      <tr
-                        key={rider.id}
-                        style={{
-                          borderBottomWidth: "1px",
-                          borderColor: "#E6E6E6",
-                        }}
-                      >
-                        <td className="p-4">
-                          R{String(index + 1).padStart(3, "0")}
-                        </td>
-                        <td className="p-4">
-                          <p>{rider.name}</p>
-                        </td>
-                        <td className="p-4">
-                          <p className="text-sm">{rider.email}</p>
-                          <p className="text-sm" style={{ color: "#2D2D2D" }}>
-                            {rider.phone}
-                          </p>
-                        </td>
-                        <td className="p-4">
-                          <Badge
-                            className={` text-black
-    ${rider.status === "active" ? "bg-green-400" : ""}
-    ${rider.status === "inactive" ? "bg-gray-300" : ""}
-    ${rider.status === "suspended" ? "bg-red-400" : ""}
-  `}
+                  {filteredRiders.map((rider, index) => (
+                    <tr
+                      key={rider.id}
+                      style={{
+                        borderBottomWidth: "1px",
+                        borderColor: "#E6E6E6",
+                      }}
+                    >
+                      <td className="p-4">
+                        R{String(index + 1).padStart(3, "0")}
+                      </td>
+
+                      <td className="p-4">
+                        <p>{rider.name}</p>
+                      </td>
+
+                      <td className="p-4">
+                        <p className="text-sm">{rider.email}</p>
+                        <p className="text-sm" style={{ color: "#2D2D2D" }}>
+                          {rider.phone}
+                        </p>
+                      </td>
+
+                      <td className="p-4">
+                        <Badge
+                          className={` text-black
+                ${rider.status === "active" ? "bg-green-400" : ""}
+                ${rider.status === "inactive" ? "bg-gray-300" : ""}
+                ${rider.status === "suspended" ? "bg-red-400" : ""}
+              `}
+                        >
+                          {rider.status}
+                        </Badge>
+                      </td>
+
+                      <td className="p-4">{rider.totalTrips}</td>
+
+                      <td className="p-4" style={{ color: "#2DB85B" }}>
+                        ${rider.totalSpent.toFixed(2)}
+                      </td>
+
+                      <td className="p-4 text-sm" style={{ color: "#2D2D2D" }}>
+                        {rider.memberSince
+                          ? rider.memberSince.toDate().toLocaleDateString()
+                          : "N/A"}
+                      </td>
+
+                      <td className="p-4 text-sm" style={{ color: "#2D2D2D" }}>
+                        {rider.lastTrip
+                          ? rider.lastTrip.toDate().toLocaleDateString()
+                          : "N/A"}
+                      </td>
+
+                      <td className="p-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedRider(rider);
+                              setIsViewDialogOpen(true);
+                            }}
                           >
-                            {rider.status}
-                          </Badge>
-                        </td>
-                        <td className="p-4">{rider.totalTrips}</td>
-                        <td className="p-4" style={{ color: "#2DB85B" }}>
-                          ${rider.totalSpent.toFixed(2)}
-                        </td>
-                        <td
-                          className="p-4 text-sm"
-                          style={{ color: "#2D2D2D" }}
-                        >
-                          {rider.memberSince
-                            ? rider.memberSince.toDate().toLocaleDateString()
-                            : "N/A"}
-                        </td>
+                            <Eye className="w-4 h-4" />
+                          </Button>
 
-                        <td
-                          className="p-4 text-sm"
-                          style={{ color: "#2D2D2D" }}
-                        >
-                          {rider.lastTrip
-                            ? rider.lastTrip.toDate().toLocaleDateString()
-                            : "N/A"}
-                        </td>
-
-                        <td className="p-4">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setSelectedRider(rider);
-                                setIsViewDialogOpen(true);
-                              }}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              style={{
-                                backgroundColor: "#2DB85B",
-                                color: "white",
-                              }}
-                              onClick={() => {
-                                setSelectedRider(rider);
-                                setIsMessageDialogOpen(true);
-                              }}
-                            >
-                              <MessageSquare className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                          <Button
+                            size="sm"
+                            style={{
+                              backgroundColor: "#2DB85B",
+                              color: "white",
+                            }}
+                            onClick={() => {
+                              setSelectedRider(rider);
+                              setIsMessageDialogOpen(true);
+                            }}
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -617,13 +613,13 @@ export function RidersPage() {
                   <div>
                     <p className="text-sm" style={{ color: "#2D2D2D" }}>
                       Last Trip
-                    </p>``
+                    </p>
+                    ``
                     <p>
-  {selectedRider.lastTrip
-    ? selectedRider.lastTrip.toDate().toLocaleDateString()
-    : "No trips yet"}
-</p>
-
+                      {selectedRider.lastTrip
+                        ? selectedRider.lastTrip.toDate().toLocaleDateString()
+                        : "No trips yet"}
+                    </p>
                   </div>
                 </div>
               </div>
