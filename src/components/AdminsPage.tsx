@@ -1,6 +1,5 @@
 "use client";
 
-// import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -23,15 +22,13 @@ import { Label } from "@/components/ui/label";
 import {
   Search,
   UserPlus,
-  Shield,
   Edit,
   Trash2,
   CircleOff,
   CheckCircle,
   UserCheck,
-  Icon,
 } from "lucide-react";
-import { Users } from "@/types";
+// import { Users } from "@/types"; // Not used directly
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -40,14 +37,10 @@ import { User } from "../models/admin";
 import { onAuthStateChanged } from "firebase/auth";
 import { Timestamp } from "firebase/firestore";
 
-import {
-  doc,
-  getDoc,
-  onSnapshot,
-  collection,
-  getDocs,
-} from "firebase/firestore";
+import { doc, getDoc, onSnapshot, collection } from "firebase/firestore";
 import Logo from "./Logo";
+
+// --- Interfaces ---
 
 interface UserData {
   id: string;
@@ -81,64 +74,26 @@ interface AdminData {
   phone?: string;
 }
 
-// const mockAdmins: AdminData[] = [
-//   {
-//     id: "1",
-//     name: "John Admin",
-//     email: "john.admin@ecogo.ca",
-//     role: "admin",
-//     status: "active",
-//     createdAt: "2024-01-15",
-//     lastLogin: "2025-11-14T09:30:00",
-//   },
-//   {
-//     id: "4",
-//     name: "Emily Chen",
-//     email: "emily.chen@ecogo.ca",
-//     role: "admin",
-//     status: "active",
-//     createdAt: "2024-01-20",
-//     lastLogin: "2025-11-14T07:20:00",
-//   },
-//   {
-//     id: "6",
-//     name: "Michael Brown",
-//     email: "michael.b@ecogo.ca",
-//     role: "admin",
-//     status: "active",
-//     createdAt: "2024-02-10",
-//     lastLogin: "2025-11-13T18:45:00",
-//   },
-//   {
-//     id: "7",
-//     name: "Sarah Johnson",
-//     email: "sarah.j@ecogo.ca",
-//     role: "admin",
-//     status: "inactive",
-//     createdAt: "2024-03-05",
-//     lastLogin: "2025-10-15T14:20:00",
-//   },
-// ];
-
 export function AdminsPage() {
-  // const [admins, setAdmins] = useState<AdminData[]>(mockAdmins);
   const [admins, setAdmins] = useState<AdminData[]>([]);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const router = useRouter();
 
+  // The following state variables are loaded but not used in the UI,
+  // but I'm keeping them for completeness.
   const [drivers, setDrivers] = useState<UserData[]>([]);
   const [riders, setRiders] = useState<UserData[]>([]);
   const [rides, setRides] = useState<RideData[]>([]);
+
   const [loading, setLoading] = useState(true);
+  const [admin, setAdmin] = useState<User | null>(null);
 
-  const [admin, setAdmin] = useState<User | null>(null); // <--- fixed
-
+  // --- Authentication and Data Load Effect ---
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.push("/"); // ✅ FIXED
+        router.push("/");
         return;
       }
 
@@ -149,7 +104,7 @@ export function AdminsPage() {
         setAdmin({ id: user.uid, ...adminSnap.data() } as User);
         loadAllData();
       } else {
-        router.push("/"); // or "/login"
+        router.push("/");
       }
 
       setLoading(false);
@@ -158,8 +113,9 @@ export function AdminsPage() {
     return () => unsubscribe();
   }, []);
 
+  // --- Real-time Data Listeners ---
   const loadAllData = () => {
-    // 🔵 Real-time: Drivers
+    // 🔵 Real-time: Admins
     const unsubscribeAdmins = onSnapshot(
       collection(db, "admins"),
       (snapshot) => {
@@ -167,11 +123,12 @@ export function AdminsPage() {
           snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
-          }))
+          })) as AdminData[] // Explicitly cast to AdminData[]
         );
       }
     );
 
+    // 🔵 Real-time: Drivers
     const unsubscribeDrivers = onSnapshot(
       collection(db, "drivers"),
       (snapshot) => {
@@ -179,7 +136,7 @@ export function AdminsPage() {
           snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
-          }))
+          })) as UserData[]
         );
       }
     );
@@ -192,7 +149,7 @@ export function AdminsPage() {
           snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
-          }))
+          })) as UserData[]
         );
       }
     );
@@ -203,7 +160,7 @@ export function AdminsPage() {
         snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        }))
+        })) as RideData[]
       );
     });
 
@@ -216,11 +173,13 @@ export function AdminsPage() {
     };
   };
 
+  // --- Loading State ---
   if (loading)
     return (
       <div className="text-center text-2xl font-semibold mt-20">Loading...</div>
     );
 
+  // --- Data Filtering and Handlers ---
   const filteredAdmins = admins.filter((admin) => {
     const name = (admin?.name ?? "").toLowerCase();
     const email = (admin?.email ?? "").toLowerCase();
@@ -231,27 +190,27 @@ export function AdminsPage() {
   const handleAddAdmin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const newAdmin: User = {
+    const newAdmin: AdminData = {
       id: `${admins.length + 1}`,
-      firstName: formData.get("firstName") as string,
-      lastName: formData.get("lastName") as string,
+      name: formData.get("name") as string, // Changed from firstName/lastName to use single name field
       email: formData.get("email") as string,
-      mobile: formData.get("mobile") as string,
+      // mobile: formData.get("mobile") as string, // Mobile field removed from form/logic for simplification
       role: "admin",
-
+      status: "inactive", // Default status for newly added mock admin
       createdAt: Timestamp.now(),
     };
 
     setAdmins([...admins, newAdmin]);
     setIsAddDialogOpen(false);
-    toast.success("Admin added successfully!");
+    toast.success("Admin added successfully! (Mock add)");
   };
 
   const handleDeleteAdmin = (id: string) => {
     setAdmins(admins.filter((admin) => admin.id !== id));
-    toast.success("Admin deleted successfully!");
+    toast.success("Admin deleted successfully! (Mock delete)");
   };
 
+  // --- Statistics Data ---
   const stats = [
     { label: "Total Admins", value: admins.length, icon: UserCheck },
     {
@@ -265,15 +224,18 @@ export function AdminsPage() {
       icon: CircleOff,
     },
   ];
+
   const adminOnlyList = filteredAdmins.filter((a) => a.role === "admin");
 
+  // --- Component Render ---
   return (
-    <div className="bg-white h-screen border-none shadow-md rounded-lg p-6">
+    <div className="bg-white min-h-screen border-none shadow-md rounded-lg p-6">
       <div className="flex lg:hidden justify-center">
         <Logo />
       </div>
       <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
+        {/* Header and Add Admin Button */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 style={{ color: "#2F3A3F" }} className="font-bold text-3xl">
               Admin Dashboard
@@ -353,7 +315,8 @@ export function AdminsPage() {
           </Dialog>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Stats Cards - Responsive Grid: 1 column on small, 3 columns on medium+ */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
@@ -372,9 +335,9 @@ export function AdminsPage() {
           })}
         </div>
 
-        {/* <Card> */}
-        <CardContent className="bg-white border-none shadow-md rounded-lg h-10">
-          <div className="relative bg-white border-none rounded-lg">
+        {/* Search Bar */}
+        <CardContent className="bg-white border-none shadow-md rounded-lg h-10 p-0">
+          <div className="relative bg-white border-none rounded-lg h-full">
             <Search
               className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-800"
               style={{ color: "#2D2D2D" }}
@@ -383,7 +346,7 @@ export function AdminsPage() {
               placeholder="Search admins by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white border-none rounded-lg focus:outline-none focus:ring-0 shadow-none"
+              className="pl-10 bg-white border-none rounded-lg focus:outline-none focus:ring-0 shadow-none h-full"
               style={{
                 boxShadow: "none", // removes internal shadow
                 outline: "none", // removes browser outline
@@ -392,23 +355,25 @@ export function AdminsPage() {
           </div>
         </CardContent>
 
+        {/* Administrators Table */}
         <Card className="bg-white border-none shadow-md rounded-lg">
           <CardHeader>
             <CardTitle>All Administrators</CardTitle>
           </CardHeader>
           <CardContent>
+            {/* The overflow-x-auto ensures horizontal scrolling on small screens if the table is too wide */}
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr
                     style={{ borderBottomWidth: "1px", borderColor: "#E6E6E6" }}
                   >
-                    <th className="text-left p-4">Name</th>
-                    <th className="text-left p-4">Email</th>
-                    <th className="text-left p-4">Status</th>
-                    <th className="text-left p-4">Created</th>
-                    <th className="text-left p-4">Last Login</th>
-                    <th className="text-right p-4">Actions</th>
+                    <th className="text-left p-4 min-w-[150px]">Name</th>
+                    <th className="text-left p-4 min-w-[200px]">Email</th>
+                    <th className="text-left p-4 min-w-[100px]">Status</th>
+                    <th className="text-left p-4 min-w-[100px]">Created</th>
+                    <th className="text-left p-4 min-w-[150px]">Last Login</th>
+                    <th className="text-right p-4 min-w-[100px]">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -424,16 +389,18 @@ export function AdminsPage() {
                         {admin.role === "admin" && (
                           <div className="flex items-center gap-2">
                             <UserCheck
-                              className="w-4 h-4"
+                              className="w-4 h-4 flex-shrink-0"
                               style={{ color: "#2DB85B" }}
                             />
-                            <span>
+                            <span className="truncate">
                               {admin.name ?? admin.email ?? "Unknown"}
                             </span>
                           </div>
                         )}
                       </td>
-                      <td className="p-4">{admin.email ?? ""}</td>
+                      <td className="p-4 truncate max-w-[200px]">
+                        {admin.email ?? ""}
+                      </td>
                       <td className="p-4">
                         <Badge
                           style={
@@ -445,22 +412,29 @@ export function AdminsPage() {
                           {admin.status}
                         </Badge>
                       </td>
-                      <td className="p-4 text-sm" style={{ color: "#2D2D2D" }}>
+                      <td
+                        className="p-4 text-sm whitespace-nowrap"
+                        style={{ color: "#2D2D2D" }}
+                      >
                         {admin.createdAt?.toDate().toLocaleDateString()}
                       </td>
-                      <td className="p-4 text-sm" style={{ color: "#2D2D2D" }}>
+                      <td
+                        className="p-4 text-sm whitespace-nowrap"
+                        style={{ color: "#2D2D2D" }}
+                      >
                         {admin.lastLogin
                           ? admin.lastLogin.toDate().toLocaleString()
                           : "Never"}
                       </td>
                       <td className="p-4">
                         <div className="flex items-center justify-end gap-2">
-                          <Button size="sm" variant="ghost">
+                          <Button size="sm" variant="ghost" title="Edit Admin">
                             <Edit className="w-4 h-4" />
                           </Button>
                           <Button
                             size="sm"
                             variant="ghost"
+                            title="Delete Admin"
                             onClick={() => handleDeleteAdmin(admin.id)}
                           >
                             <Trash2 className="w-4 h-4 text-red-600" />
@@ -471,6 +445,11 @@ export function AdminsPage() {
                   ))}
                 </tbody>
               </table>
+              {adminOnlyList.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  No administrators found matching your search.
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -478,210 +457,3 @@ export function AdminsPage() {
     </div>
   );
 }
-
-// --- Interfaces ---
-// interface UserData {
-//   id: string;
-//   name?: string;
-//   email?: string;
-//   phone?: string;
-//   [key: string]: any;
-// }
-
-// interface RideData {
-//   id: string;
-//   pickup: string;
-//   destination: string;
-//   name: string;
-//   fare: number;
-//   status: string;
-//   riderId: string;
-//   driverId: string;
-// }
-
-// interface AdminData {
-//   name?: string;
-//   email?: string;
-//   role?: string;
-// }
-
-// export default function AdminDashboard() {
-//   const router = useRouter();
-
-//   const [adminData, setAdminData] = useState<AdminData | null>(null);
-
-//   const [drivers, setDrivers] = useState<UserData[]>([]);
-//   const [riders, setRiders] = useState<UserData[]>([]);
-//   const [rides, setRides] = useState<RideData[]>([]);
-
-//   const [loading, setLoading] = useState(true);
-
-//   // --- Authentication ---
-//   useEffect(() => {
-//     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-//       if (!user) {
-//         router.push("/");
-//         return;
-//       }
-
-//       const adminRef = doc(db, "admins", user.uid);
-//       const adminSnap = await getDoc(adminRef);
-
-//       if (adminSnap.exists()) {
-//         setAdminData(adminSnap.data());
-//         loadAllData(); // <--- now real-time
-//       } else {
-//         router.push("/");
-//       }
-
-//       setLoading(false);
-//     });
-
-//     return () => unsubscribe();
-//   }, []);
-
-//   // --- Load Data (drivers, riders, rides) ---
-
-//   const loadAllData = () => {
-//     // 🔵 Real-time: Drivers
-//     const unsubscribeDrivers = onSnapshot(
-//       collection(db, "drivers"),
-//       (snapshot) => {
-//         setDrivers(
-//           snapshot.docs.map((doc) => ({
-//             id: doc.id,
-//             ...doc.data(),
-//           }))
-//         );
-//       }
-//     );
-
-//     // 🟢 Real-time: Riders
-//     const unsubscribeRiders = onSnapshot(
-//       collection(db, "riders"),
-//       (snapshot) => {
-//         setRiders(
-//           snapshot.docs.map((doc) => ({
-//             id: doc.id,
-//             ...doc.data(),
-//           }))
-//         );
-//       }
-//     );
-
-//     // 🟠 Real-time: Rides
-//     const unsubscribeRides = onSnapshot(collection(db, "rides"), (snapshot) => {
-//       setRides(
-//         snapshot.docs.map((doc) => ({
-//           id: doc.id,
-//           ...doc.data(),
-//         }))
-//       );
-//     });
-
-//     // Return all unsubs so you can close listeners when admin logs out or leaves page
-//     return () => {
-//       unsubscribeDrivers();
-//       unsubscribeRiders();
-//       unsubscribeRides();
-//     };
-//   };
-
-//   if (loading)
-//     return (
-//       <div className="text-center text-2xl font-semibold mt-20">Loading...</div>
-//     );
-
-//   return (
-//     <div className="flex h-screen bg-gray-100">
-//       {/* <AdminSidebar
-//         name={adminData?.name}
-//         email={adminData?.email}
-//         role={adminData?.role}
-//       /> */}
-
-//       {/* MAIN CONTENT */}
-//       <main className="flex-1 p-8 overflow-y-auto">
-//         {/* Header */}
-//         <div className="flex justify-between items-center mb-10 border-b pb-4">
-//           <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-//         </div>
-
-//         {/* Stats */}
-//         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-//           <div className="bg-white p-6 rounded-xl shadow border-t-4 border-emerald-500">
-//             <p className="text-gray-500 text-sm">Total Drivers</p>
-//             <p className="text-4xl font-bold">{drivers.length}</p>
-//           </div>
-
-//           <div className="bg-white p-6 rounded-xl shadow border-t-4 border-blue-500">
-//             <p className="text-gray-500 text-sm">Total Riders</p>
-//             <p className="text-4xl font-bold">{riders.length}</p>
-//           </div>
-
-//           <div className="bg-white p-6 rounded-xl shadow border-t-4 border-purple-500">
-//             <p className="text-gray-500 text-sm">Total Rides</p>
-//             <p className="text-4xl font-bold">{rides.length}</p>
-//           </div>
-//         </div>
-
-//         {/* Lists */}
-//         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-//           {/* Drivers */}
-//           <div className="bg-white rounded-xl shadow overflow-hidden">
-//             <div className="p-4 bg-gray-50 border-b">
-//               <h3 className="text-xl font-bold">Drivers ({drivers.length})</h3>
-//             </div>
-
-//             <ul className="max-h-96 overflow-y-auto divide-y">
-//               {drivers.map((driver) => (
-//                 <li key={driver.id} className="p-4 hover:bg-gray-50">
-//                   <p className="font-semibold">{driver.name}</p>
-//                   <p className="text-sm text-gray-500">{driver.email}</p>
-//                 </li>
-//               ))}
-//             </ul>
-//           </div>
-
-//           {/* Riders */}
-//           <div className="bg-white rounded-xl shadow overflow-hidden">
-//             <div className="p-4 bg-gray-50 border-b">
-//               <h3 className="text-xl font-bold">Riders ({riders.length})</h3>
-//             </div>
-
-//             <ul className="max-h-96 overflow-y-auto divide-y">
-//               {riders.map((rider) => (
-//                 <li key={rider.id} className="p-4 hover:bg-gray-50">
-//                   <p className="font-semibold">{rider.name}</p>
-//                   <p className="text-sm text-gray-500">{rider.email}</p>
-//                 </li>
-//               ))}
-//             </ul>
-//           </div>
-
-//           {/* Rides */}
-//           <div className="bg-white rounded-xl shadow overflow-hidden">
-//             <div className="p-4 bg-gray-50 border-b">
-//               <h3 className="text-xl font-bold">Rides ({rides.length})</h3>
-//             </div>
-
-//             <ul className="max-h-96 overflow-y-auto divide-y">
-//               {rides.map((ride) => (
-//                 <li key={ride.id} className="p-4 hover:bg-gray-50">
-//                   <p className="font-semibold">
-//                     {ride.pickup?.name ?? "Unknown Pickup"} →
-//                     {ride.destination?.name ?? "Unknown Destination"}
-//                   </p>
-//                   <p className="text-sm text-gray-500">Status: {ride.status}</p>
-//                   <p className="text-sm text-gray-400">
-//                     Fare: {ride.fare ?? 0} ETB
-//                   </p>
-//                 </li>
-//               ))}
-//             </ul>
-//           </div>
-//         </div>
-//       </main>
-//     </div>
-//   );
-// }

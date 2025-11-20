@@ -275,7 +275,7 @@ export function DriversPage() {
         <Logo />
       </div>
       <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1
               style={{ color: "var(--charcoal-dark)" }}
@@ -401,7 +401,7 @@ export function DriversPage() {
           </Dialog>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (

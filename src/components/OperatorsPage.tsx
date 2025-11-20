@@ -139,13 +139,17 @@ export function OperatorsPage() {
   ];
 
   return (
-    <div className="bg-white h-screen border-none shadow-md rounded-lg p-4">
+    <div className="bg-white min-h-screen border-none shadow-md rounded-lg p-4">
       <div className="flex lg:hidden justify-center">
         <Logo />
       </div>
 
-      <div className="p-6 space-y-6 ">
-        <div className="flex items-center justify-between">
+      <div className="p-4 sm:p-6 space-y-6">
+        {" "}
+        {/* Reduced initial padding for smaller screens */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          {" "}
+          {/* Stack elements vertically on small screens */}
           <div>
             <h1
               style={{ color: "#2F3A3F" }}
@@ -238,14 +242,15 @@ export function OperatorsPage() {
             </DialogContent>
           </Dialog>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 w-full h-35 gap-32">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 w-full h-auto gap-4 md:gap-8 lg:gap-32">
+          {" "}
+          {/* Changed gap and made it 2 columns on small/medium screens, 3 on large */}
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
               <Card
                 key={stat.label}
-                className="bg-white border-none shadow-lg w-70"
+                className="bg-white border-none shadow-lg w-full" /* w-70 changed to w-full to be responsive */
               >
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-2 mb-2">
@@ -262,8 +267,7 @@ export function OperatorsPage() {
             );
           })}
         </div>
-
-        <Card className=" border-none shadow-lg rounded-lg h-16  my-5">
+        <Card className=" border-none shadow-lg rounded-lg h-16 my-5">
           <div className="relative bg-white border-none rounded-lg">
             <Search
               className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-800"
@@ -281,40 +285,34 @@ export function OperatorsPage() {
             />
           </div>
         </Card>
-
-        {/* <Card style={{ backgroundColor: "#E0F2FE", borderColor: "#075985" }}>
-        <CardContent className="pt-6">
-          <div className="flex items-start gap-3">
-            <Users className="w-5 h-5 mt-1" style={{ color: "#075985" }} />
-            <div>
-              <h4 style={{ color: "#075985" }}>Operator Role</h4>
-              <p style={{ color: "#075985" }}>
-                Operators have limited access to manage day-to-day operations
-                including bookings and dispatch. They can view reports but
-                cannot access sensitive settings or user management features.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card> */}
-
         <Card className="bg-white border-none shadow-lg rounded-lg">
           <CardHeader>
             <CardTitle>All Operators</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
+            {" "}
+            {/* Remove padding here to allow table overflow to use all CardContent space */}
             <div className="overflow-x-auto">
-              <table className="w-full">
+              {" "}
+              {/* Added overflow-x-auto to make the table horizontally scrollable on small screens */}
+              <table className="min-w-full divide-y divide-gray-200">
+                {" "}
+                {/* Added min-w-full to ensure it can scroll */}
                 <thead>
                   <tr
                     style={{ borderBottomWidth: "1px", borderColor: "#E6E6E6" }}
                   >
-                    <th className="text-left p-4">Name</th>
-                    <th className="text-left p-4">Email</th>
-                    <th className="text-left p-4">Status</th>
-                    <th className="text-left p-4">Created</th>
-                    <th className="text-left p-4">Last Login</th>
-                    <th className="text-right p-4">Actions</th>
+                    <th className="text-left p-4 whitespace-nowrap">Name</th>{" "}
+                    {/* Added whitespace-nowrap to prevent column headers from wrapping */}
+                    <th className="text-left p-4 whitespace-nowrap">Email</th>
+                    <th className="text-left p-4 whitespace-nowrap">Status</th>
+                    <th className="text-left p-4 whitespace-nowrap">Created</th>
+                    <th className="text-left p-4 whitespace-nowrap">
+                      Last Login
+                    </th>
+                    <th className="text-right p-4 whitespace-nowrap">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -326,7 +324,7 @@ export function OperatorsPage() {
                         borderColor: "#E6E6E6",
                       }}
                     >
-                      <td className="p-4">
+                      <td className="p-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <Users
                             className="w-4 h-4"
@@ -335,8 +333,10 @@ export function OperatorsPage() {
                           <span>{operator.name}</span>
                         </div>
                       </td>
-                      <td className="p-4">{operator.email}</td>
-                      <td className="p-4">
+                      <td className="p-4 whitespace-nowrap">
+                        {operator.email}
+                      </td>
+                      <td className="p-4 whitespace-nowrap">
                         <Badge
                           style={
                             operator.status === "active"
@@ -347,15 +347,21 @@ export function OperatorsPage() {
                           {operator.status}
                         </Badge>
                       </td>
-                      <td className="p-4 text-sm" style={{ color: "#2D2D2D" }}>
+                      <td
+                        className="p-4 text-sm whitespace-nowrap"
+                        style={{ color: "#2D2D2D" }}
+                      >
                         {new Date(operator.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="p-4 text-sm" style={{ color: "#2D2D2D" }}>
+                      <td
+                        className="p-4 text-sm whitespace-nowrap"
+                        style={{ color: "#2D2D2D" }}
+                      >
                         {operator.lastLogin
                           ? new Date(operator.lastLogin).toLocaleString()
                           : "Never"}
                       </td>
-                      <td className="p-4">
+                      <td className="p-4 whitespace-nowrap">
                         <div className="flex items-center justify-end gap-2">
                           <Button size="sm" variant="ghost">
                             <Edit className="w-4 h-4" />

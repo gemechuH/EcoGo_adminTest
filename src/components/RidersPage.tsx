@@ -103,52 +103,51 @@ export function RidersPage() {
       const adminRef = doc(db, "admins", user.uid);
       const adminSnap = await getDoc(adminRef);
       
-
       // useEffect(() => {
-      //   const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      //     if (!user) {
-      //       router.push("/riders");
-      //       return;
-      //     }
+      // 	 const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      // 	 	 if (!user) {
+      // 	 	 	 router.push("/riders");
+      // 	 	 	 return;
+      // 	 	 }
 
-      //     const adminRef = doc(db, "admins", user.uid);
-      //     const adminSnap = await getDoc(adminRef);
+      // 	 	 const adminRef = doc(db, "admins", user.uid);
+      // 	 	 const adminSnap = await getDoc(adminRef);
 
-      //     if (adminSnap.exists()) {
-      //       const data = adminSnap.data();
+      // 	 	 if (adminSnap.exists()) {
+      // 	 	 	 const data = adminSnap.data();
 
-      //       setAdminData({
-      //         id: user.uid,
-      //         ...data,
-      //       } as AdminData);
+      // 	 	 	 setAdminData({
+      // 	 	 	 	 id: user.uid,
+      // 	 	 	 	 ...data,
+      // 	 	 	 } as AdminData);
 
-      //       loadAllData();
-      //     } else {
-      //       router.push("/login");
-      //     }
+      // 	 	 	 loadAllData();
+      // 	 	 } else {
+      // 	 	 	 router.push("/login");
+      // 	 	 }
 
-      //     setLoading(false);
-      //   });
+      // 	 	 setLoading(false);
+      // 	 });
 
-      //   return () => unsubscribe();
+      // 	 return () => unsubscribe();
       // }, []);
-  if (adminSnap.exists()) {
-    const data = adminSnap.data();
+      if (adminSnap.exists()) {
+        const data = adminSnap.data();
 
-    setAdminData({
-      id: user.uid,
-      firstName: data.firstName ?? "",
-      lastName: data.lastName ?? "",
-      email: data.email ?? "",
-      role: data.role ?? "",
-      mobile: data.mobile ?? "",
-      canOverride: data.canOverride ?? false,
-    });
+        setAdminData({
+          id: user.uid,
+          firstName: data.firstName ?? "",
+          lastName: data.lastName ?? "",
+          email: data.email ?? "",
+          role: data.role ?? "",
+          mobile: data.mobile ?? "",
+          canOverride: data.canOverride ?? false,
+        });
 
-    loadAllData();
-  } else {
-    router.push("/login");
-  }
+        loadAllData();
+      } else {
+        router.push("/login");
+      }
 
       setLoading(false);
     });
@@ -271,17 +270,17 @@ export function RidersPage() {
   };
 
   return (
-    <div className="bg-white h-screen border-none shadow-md rounded-lg p-4">
+    <div className="bg-white min-h-screen border-none shadow-md rounded-lg p-4">
       <div className="flex lg:hidden justify-center">
         <Logo />
       </div>
-      <div className="p-6 space-y-6 ">
-        <div className="flex items-center justify-between">
+      <div className="p-4 sm:p-6 space-y-6"> {/* Reduced initial padding for small screens */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"> {/* Stack elements vertically on small screens */}
           <div>
             <h1 style={{ color: "#2F3A3F" }} className="font-bold text-2xl sm:text-3xl">
               Riders Dashboard
             </h1>
-            <p style={{ color: "#2D2D2D" }} className="text-lg">
+            <p style={{ color: "#2D2D2D" }} className="text-sm sm:text-lg"> {/* Reduced text size on small screens */}
               Manage and monitor all riders
             </p>
           </div>
@@ -296,7 +295,7 @@ export function RidersPage() {
 
             <DialogContent
               className="
-        max-w-md p-6 rounded-lg shadow-xl
+        max-w-xs sm:max-w-md p-6 rounded-lg shadow-xl {/* Adjusted max-width for mobile */}
         text-[#1E1E1E] bg-white
         !bg-[white]
         border border-[#ffffff]
@@ -375,22 +374,22 @@ export function RidersPage() {
           </Dialog>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 w-full h-35 gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 w-full h-auto gap-4 md:gap-5"> {/* Changed to 2 columns on small screens, 4 on medium/large */}
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
               <Card
                 key={stat.label}
-                className="bg-white border-none shadow-lg w-70"
+                className="bg-white border-none shadow-lg w-full" 
               >
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-8 h-10 rounded-lg flex items-center justify-center">
                       <Icon className="w-5 h-5" style={{ color: "#2DB85B" }} />
                     </div>
-                    <h3 style={{ color: "#2D2D2D" }}>{stat.value}</h3>
+                    <h3 style={{ color: "#2D2D2D" }} className="text-xl md:text-2xl">{stat.value}</h3> {/* Ensured value is prominent */}
                   </div>
-                  <p className="mt-6" style={{ color: "#2D2D2D" }}>
+                  <p className="mt-4 text-sm" style={{ color: "#2D2D2D" }}> {/* Reduced margin and text size for compact view */}
                     {stat.label}
                   </p>
                 </CardContent>
@@ -399,14 +398,14 @@ export function RidersPage() {
           })}
         </div>
 
-        <Card className=" border-none shadow-lg rounded-lg h-16  my-5">
+        <Card className=" border-none shadow-lg rounded-lg h-16 my-5">
           <div className="relative bg-white border-none rounded-lg">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-800" />
             <Input
               placeholder="Search riders by name, email, or ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white border-none rounded-lg focus:outline-none h-16 text-lg focus:ring-0 shadow-none "
+              className="pl-10 bg-white border-none rounded-lg focus:outline-none h-16 text-base sm:text-lg focus:ring-0 shadow-none " 
               style={{
                 boxShadow: "none", // removes internal shadow
                 outline: "none", // removes browser outline
@@ -419,22 +418,22 @@ export function RidersPage() {
           <CardHeader>
             <CardTitle>All Riders</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="w-full overflow-x-auto">
-              <table className="w-full min-w-[900px]">
+          <CardContent className="p-0"> {/* Removed padding from CardContent to allow the table to fill the space */}
+            <div className="w-full overflow-x-auto"> {/* Added overflow-x-auto to make the table scrollable horizontally */}
+              <table className="w-full min-w-[1000px]"> {/* Increased min-w to ensure table doesn't compress too much */}
                 <thead>
                   <tr
                     style={{ borderBottomWidth: "1px", borderColor: "#E6E6E6" }}
                   >
-                    <th className="text-left p-4">ID</th>
-                    <th className="text-left p-4">Name</th>
-                    <th className="text-left p-4">Contact</th>
-                    <th className="text-left p-4">Status</th>
-                    <th className="text-left p-4">Total Trips</th>
-                    <th className="text-left p-4">Total Spent</th>
-                    <th className="text-left p-4">Member Since</th>
-                    <th className="text-left p-4">Last Trip</th>
-                    <th className="text-right p-4">Actions</th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">ID</th> {/* Added whitespace-nowrap and smaller text for table headers */}
+                    <th className="text-left p-4 whitespace-nowrap text-sm">Name</th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">Contact</th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">Status</th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">Total Trips</th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">Total Spent</th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">Member Since</th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">Last Trip</th>
+                    <th className="text-right p-4 whitespace-nowrap text-sm">Actions</th>
                   </tr>
                 </thead>
 
@@ -447,55 +446,55 @@ export function RidersPage() {
                         borderColor: "#E6E6E6",
                       }}
                     >
-                      <td className="p-4">
+                      <td className="p-4 text-sm whitespace-nowrap"> {/* Added smaller text and nowrap to table cells */}
                         R{String(index + 1).padStart(3, "0")}
                       </td>
 
-                      <td className="p-4">
+                      <td className="p-4 text-sm whitespace-nowrap">
                         <p>{rider.name}</p>
                       </td>
 
-                      <td className="p-4">
-                        <p className="text-sm">{rider.email}</p>
-                        <p className="text-sm" style={{ color: "#2D2D2D" }}>
+                      <td className="p-4 text-sm whitespace-nowrap">
+                        <p className="text-xs">{rider.email}</p> {/* Even smaller text for email/phone */}
+                        <p className="text-xs" style={{ color: "#2D2D2D" }}>
                           {rider.phone}
                         </p>
                       </td>
 
-                      <td className="p-4">
+                      <td className="p-4 whitespace-nowrap">
                         <Badge
-                          className={` text-black
-                ${rider.status === "active" ? "bg-green-400" : ""}
-                ${rider.status === "inactive" ? "bg-gray-300" : ""}
-                ${rider.status === "suspended" ? "bg-red-400" : ""}
-              `}
+                          className={` text-black text-xs
+              ${rider.status === "active" ? "bg-green-400" : ""}
+              ${rider.status === "inactive" ? "bg-gray-300" : ""}
+              ${rider.status === "suspended" ? "bg-red-400" : ""}
+            `}
                         >
                           {rider.status}
                         </Badge>
                       </td>
 
-                      <td className="p-4">{rider.totalTrips}</td>
+                      <td className="p-4 text-sm whitespace-nowrap">{rider.totalTrips}</td>
 
-                      <td className="p-4" style={{ color: "#2DB85B" }}>
+                      <td className="p-4 text-sm whitespace-nowrap" style={{ color: "#2DB85B" }}>
                         ${rider.totalSpent.toFixed(2)}
                       </td>
 
-                      <td className="p-4 text-sm" style={{ color: "#2D2D2D" }}>
+                      <td className="p-4 text-xs whitespace-nowrap" style={{ color: "#2D2D2D" }}>
                         {rider.memberSince
                           ? rider.memberSince.toDate().toLocaleDateString()
                           : "N/A"}
                       </td>
 
-                      <td className="p-4 text-sm" style={{ color: "#2D2D2D" }}>
+                      <td className="p-4 text-xs whitespace-nowrap" style={{ color: "#2D2D2D" }}>
                         {rider.lastTrip
                           ? rider.lastTrip.toDate().toLocaleDateString()
                           : "N/A"}
                       </td>
 
-                      <td className="p-4">
-                        <div className="flex items-center justify-end gap-2">
+                      <td className="p-4 whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1"> {/* Reduced gap */}
                           <Button
-                            size="sm"
+                            size="icon" /* Changed to size="icon" for smaller buttons on mobile */
                             variant="outline"
                             onClick={() => {
                               setSelectedRider(rider);
@@ -506,7 +505,7 @@ export function RidersPage() {
                           </Button>
 
                           <Button
-                            size="sm"
+                            size="icon" /* Changed to size="icon" for smaller buttons on mobile */
                             style={{
                               backgroundColor: "#2DB85B",
                               color: "white",
@@ -530,7 +529,7 @@ export function RidersPage() {
 
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
           <DialogContent
-            className="max-w-md p-6 rounded-lg shadow-xl text-[#1E1E1E] bg-white
+            className="max-w-xs sm:max-w-md p-6 rounded-lg shadow-xl text-[#1E1E1E] bg-white
         !bg-[white]
         border border-[#ffffff]"
           >
@@ -625,7 +624,7 @@ export function RidersPage() {
           onOpenChange={setIsMessageDialogOpen}
         >
           <DialogContent
-            className="max-w-md  text-[#1E1E1E] bg-white
+            className="max-w-xs sm:max-w-md text-[#1E1E1E] bg-white {/* Adjusted max-width for mobile */}
         !bg-[white]
         border border-[#ffffff]"
           >
