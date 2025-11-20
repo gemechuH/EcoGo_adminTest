@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { User } from "@/types";
 import { toast } from "sonner";
+import Logo from "./Logo";
 
 const mockOperators: User[] = [
   {
@@ -138,11 +139,18 @@ export function OperatorsPage() {
   ];
 
   return (
-    <div className="bg-white h-screen border-none shadow-md rounded-lg p-8">
+    <div className="bg-white h-screen border-none shadow-md rounded-lg p-4">
+      <div className="flex lg:hidden justify-center">
+        <Logo />
+      </div>
+
       <div className="p-6 space-y-6 ">
         <div className="flex items-center justify-between">
           <div>
-            <h1 style={{ color: "#2F3A3F" }} className="text-3xl">
+            <h1
+              style={{ color: "#2F3A3F" }}
+              className="font-bold text-2xl sm:text-3xl"
+            >
               Operator Dashboard
             </h1>
             <p style={{ color: "#2D2D2D" }}>

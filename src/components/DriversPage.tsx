@@ -49,6 +49,7 @@ import {
   Wifi,
 } from "lucide-react";
 import { toast } from "sonner";
+import Logo from "./Logo";
 
 interface Rider {
   id: string;
@@ -269,13 +270,16 @@ export function DriversPage() {
   };
 
   return (
-    <div className="bg-white h-full border-none shadow-md rounded-lg p-6">
+    <div className="bg-white h-full border-none shadow-md rounded-lg p-4">
+      <div className="flex lg:hidden justify-center">
+        <Logo />
+      </div>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1
               style={{ color: "var(--charcoal-dark)" }}
-              className="font-bold text-3xl"
+              className="font-bold text-2xl sm:text-3xl"
             >
               Drivers Dashboard
             </h1>
@@ -398,16 +402,13 @@ export function DriversPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {stats.map((stat) => { 
+          {stats.map((stat) => {
             const Icon = stat.icon;
             return (
               <Card key={stat.label} className="bg-white border-none shadow-md">
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <div
-                      className="w-8 h-10 rounded-lg flex items-center justify-center"
-                      
-                    >
+                    <div className="w-8 h-10 rounded-lg flex items-center justify-center">
                       <Icon className="w-5 h-5" style={{ color: "#2DB85B" }} />
                     </div>
                     <h3 style={{ color: "#2D2D2D" }}>{stat.value}</h3>
@@ -415,7 +416,8 @@ export function DriversPage() {
                   <p style={{ color: "#2D2D2D" }}>{stat.label}</p>
                 </CardContent>
               </Card>
-            );})}
+            );
+          })}
         </div>
 
         <Card className="bg-white border-none shadow-md rounded-lg h-10">

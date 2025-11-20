@@ -55,7 +55,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
           <div className="space-y-1">
             {/* Title: Using the brand color for emphasis */}
             <h1 className="text-3xl font-extrabold text-gray-800">
-              EcoGo Admin Panel
+              Admin Dashboard
             </h1>
             {/* Subtitle: Using a muted text color */}
             <p className="text-sm text-gray-600">Drive Clean. Go Green.</p>
@@ -185,7 +185,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               {/* Submit Button: Solid brand green */}
               <Button
                 type="submit"
-                className="w-full text-lg py-4 font-bold hover:brightness-110 transition-all duration-200"
+                className="w-full text-lg py-4 coursor-pointer hover:brightness-110 transition-all duration-200"
                 style={{ backgroundColor: "var(--eco-green)", color: "white" }}
               >
                 Sign In

@@ -47,6 +47,7 @@ import {
   collection,
   getDocs,
 } from "firebase/firestore";
+import Logo from "./Logo";
 
 interface UserData {
   id: string;
@@ -268,6 +269,9 @@ export function AdminsPage() {
 
   return (
     <div className="bg-white h-screen border-none shadow-md rounded-lg p-6">
+      <div className="flex lg:hidden justify-center">
+        <Logo />
+      </div>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>

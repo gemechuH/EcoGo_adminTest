@@ -44,6 +44,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import Logo from "./Logo";
 
 interface Rider {
   id: string;
@@ -270,11 +271,14 @@ export function RidersPage() {
   };
 
   return (
-    <div className="bg-white h-screen border-none shadow-md rounded-lg p-8">
+    <div className="bg-white h-screen border-none shadow-md rounded-lg p-4">
+      <div className="flex lg:hidden justify-center">
+        <Logo />
+      </div>
       <div className="p-6 space-y-6 ">
         <div className="flex items-center justify-between">
           <div>
-            <h1 style={{ color: "#2F3A3F" }} className="font-bold text-3xl">
+            <h1 style={{ color: "#2F3A3F" }} className="font-bold text-2xl sm:text-3xl">
               Riders Dashboard
             </h1>
             <p style={{ color: "#2D2D2D" }} className="text-lg">
@@ -381,18 +385,10 @@ export function RidersPage() {
               >
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <div
-                      className="w-8 h-10 rounded-lg flex items-center justify-center"
-                      
-                    >
+                    <div className="w-8 h-10 rounded-lg flex items-center justify-center">
                       <Icon className="w-5 h-5" style={{ color: "#2DB85B" }} />
                     </div>
-                    <h3
-                     
-                      style={{ color: "#2D2D2D" }}
-                    >
-                      {stat.value}
-                    </h3>
+                    <h3 style={{ color: "#2D2D2D" }}>{stat.value}</h3>
                   </div>
                   <p className="mt-6" style={{ color: "#2D2D2D" }}>
                     {stat.label}

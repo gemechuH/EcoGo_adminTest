@@ -18,6 +18,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { mockAnalytics } from "@/lib/mockData";
+import Logo from "./Logo";
 
 export function DashboardPage() {
   const stats = [
@@ -60,12 +61,16 @@ export function DashboardPage() {
 
   return (
     <div className="bg-white border-none shadow-md rounded-lg p-4">
+      <div className="flex lg:hidden justify-center">
+        <Logo />
+      </div>
+
       <div className="p-6 space-y-6">
         {/* Header */}
         <div>
           <h1
             style={{ color: "var(--charcoal-dark)" }}
-            className="font-bold text-3xl"
+            className="font-bold text-2xl sm:text-3xl"
           >
             Dashboard
           </h1>

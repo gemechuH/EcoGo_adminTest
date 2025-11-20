@@ -77,7 +77,7 @@ export function Sidebar({
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:static top-0 left-0 h-full z-40 w-55 flex flex-col transition-transform duration-300 ease-in-out
+        className={`fixed md:static top-0 left-0 h-full z-40 w-50 flex flex-col transition-transform duration-300 ease-in-out
         bg-[var(--charcoal-dark)] ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
@@ -92,9 +92,7 @@ export function Sidebar({
               height={60}
               className="rounded-[10px]"
             />
-            <div>
-              <h3 className="text-white">EcoGo</h3>
-            </div>
+           
           </div>
         </div>
 
