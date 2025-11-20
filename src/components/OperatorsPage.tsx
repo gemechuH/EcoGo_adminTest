@@ -38,9 +38,9 @@ import { toast } from "sonner";
 const mockOperators: User[] = [
   {
     id: "1",
-    uid: "1",
-    name: "Alex Thompson",
-    email: "alex.thompson@ecogo.ca",
+    uid: "2",
+    name: "Heyru Jemal",
+    email: "operator@ecogo.ca",
     role: "operator",
     status: "active",
     createdAt: "2024-03-10",
@@ -49,6 +49,16 @@ const mockOperators: User[] = [
   {
     id: "2",
     uid: "2",
+    name: "Alex Thompson",
+    email: "alex.thompson@ecogo.ca",
+    role: "operator",
+    status: "active",
+    createdAt: "2024-03-10",
+    lastLogin: "2025-11-15T08:15:00",
+  },
+  {
+    id: "3",
+    uid: "3",
     name: "Jessica Martinez",
     email: "jessica.m@ecogo.ca",
     role: "operator",
@@ -57,8 +67,8 @@ const mockOperators: User[] = [
     lastLogin: "2025-11-15T07:30:00",
   },
   {
-    id: "3",
-    uid: "3",
+    id: "4",
+    uid: "4",
     name: "David Lee",
     email: "david.lee@ecogo.ca",
     role: "operator",
@@ -67,8 +77,8 @@ const mockOperators: User[] = [
     lastLogin: "2025-11-14T18:45:00",
   },
   {
-    id: "4",
-    uid: "4",
+    id: "5",
+    uid: "5",
     name: "Rachel Green",
     email: "rachel.g@ecogo.ca",
     role: "operator",
