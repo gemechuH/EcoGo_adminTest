@@ -74,12 +74,11 @@ interface AdminData {
   email?: string;
   role?: string;
   status?: string;
-  createdAt?: Timestamp
-  lastLogin?: Timestamp
+  createdAt?: Timestamp;
+  lastLogin?: Timestamp;
   [key: string]: any;
   phone?: string;
 }
-
 
 // const mockAdmins: AdminData[] = [
 //   {
@@ -135,29 +134,28 @@ export function AdminsPage() {
 
   const [admin, setAdmin] = useState<User | null>(null); // <--- fixed
 
- useEffect(() => {
-   const unsubscribe = onAuthStateChanged(auth, async (user) => {
-     if (!user) {
-       router.push("/"); // ✅ FIXED
-       return;
-     }
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        router.push("/"); // ✅ FIXED
+        return;
+      }
 
-     const adminRef = doc(db, "admins", user.uid);
-     const adminSnap = await getDoc(adminRef);
+      const adminRef = doc(db, "admins", user.uid);
+      const adminSnap = await getDoc(adminRef);
 
-     if (adminSnap.exists()) {
-       setAdmin({ id: user.uid, ...adminSnap.data() } as User);
-       loadAllData();
-     } else {
-       router.push("/"); // or "/login"
-     }
+      if (adminSnap.exists()) {
+        setAdmin({ id: user.uid, ...adminSnap.data() } as User);
+        loadAllData();
+      } else {
+        router.push("/"); // or "/login"
+      }
 
-     setLoading(false);
-   });
+      setLoading(false);
+    });
 
-   return () => unsubscribe();
- }, []);
-
+    return () => unsubscribe();
+  }, []);
 
   const loadAllData = () => {
     // 🔵 Real-time: Drivers
@@ -257,13 +255,16 @@ export function AdminsPage() {
     { label: "Total Admins", value: admins.length, icon: UserCheck },
     {
       label: "Active",
-      value: admins.filter((a) => a.status === "active").length, icon: CheckCircle
+      value: admins.filter((a) => a.status === "active").length,
+      icon: CheckCircle,
     },
     {
       label: "Inactive",
-      value: admins.filter((a) => a.status === "inactive").length, icon: CircleOff
+      value: admins.filter((a) => a.status === "inactive").length,
+      icon: CircleOff,
     },
   ];
+  const adminOnlyList = filteredAdmins.filter((a) => a.role === "admin");
 
   return (
     <div className="bg-white h-screen border-none shadow-md rounded-lg p-6">
@@ -407,7 +408,7 @@ export function AdminsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredAdmins.map((admin) => (
+                  {adminOnlyList.map((admin) => (
                     <tr
                       key={admin.id}
                       style={{
@@ -416,15 +417,17 @@ export function AdminsPage() {
                       }}
                     >
                       <td className="p-4">
-                        <div className="flex items-center gap-2">
-                          <UserCheck
-                            className="w-4 h-4"
-                            style={{ color: "#2DB85B" }}
-                          />
-                          <span>
-                            {admin.firstName ?? admin.email ?? "Unknown"}
-                          </span>
-                        </div>
+                        {admin.role === "admin" && (
+                          <div className="flex items-center gap-2">
+                            <UserCheck
+                              className="w-4 h-4"
+                              style={{ color: "#2DB85B" }}
+                            />
+                            <span>
+                              {admin.name ?? admin.email ?? "Unknown"}
+                            </span>
+                          </div>
+                        )}
                       </td>
                       <td className="p-4">{admin.email ?? ""}</td>
                       <td className="p-4">
