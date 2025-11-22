@@ -197,11 +197,11 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               <p className="text-sm text-gray-500">
                 Need help? Contact{" "}
                 <Link
-                  href="mailto: support@ecogo.ca"
+                  href="mailto: support@ecogoclub.com"
                   className="font-medium hover:underline transition-colors"
                   style={{ color: "var(--eco-green)" }}
                 >
-                  support@ecogo.ca
+                  support@ecogoclub.com
                 </Link>
               </p>
               <p className="text-xs text-gray-400">

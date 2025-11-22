@@ -104,20 +104,20 @@ export function DashboardPage() {
   return (
     <div className="bg-white border-none shadow-md rounded-lg p-4">
       <div className="flex lg:hidden justify-center">
-        <Logo/>
+        <Logo />
       </div>
 
       <div className="p-6 space-y-6">
         {/* Header */}
         <div>
           <h1
-            style={{ color: "var(--charcoal-dark)" }}
-            className="font-bold text-2xl sm:text-3xl"
+            // style={{ color: "var(--charcoal-dark)" }}
+            className="font-bold text-1xl sm:text-2xl  bg-[var(--charcoal-dark)] text-white p-1 rounded-md"
           >
-            Dashboard
+            Admin Dashboard
           </h1>
-          <p style={{ color: "var(--charcoal-dark)" }} className="text-lg">
-            Overview of your EcoGo operations
+          <p style={{ color: "var(--charcoal-dark)" }} className="text-lg pl-2">
+                 Overview of your EcoGo operations
           </p>
         </div>
 
@@ -162,10 +162,7 @@ export function DashboardPage() {
 
         {/* NEW SECTION — SERVICE TYPE BREAKDOWN */}
         <div>
-          <h2
-            className="font-bold text-xl mb-4"
-            style={{ color: "var(--charcoal-dark)" }}
-          >
+          <h2 className="font-bold text-xl mb-4 bg-[var(--charcoal-dark)] text-white p-1 rounded-md">
             Service Type Breakdown
           </h2>
 
@@ -210,8 +207,10 @@ export function DashboardPage() {
         {/* Charts Row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="bg-white border-none shadow-md ">
-            <CardHeader className="p-2 text-center">
-              <CardTitle className="">Bookings Trend (7 Days)</CardTitle>
+            <CardHeader className="p-2 flex justify-center">
+              <CardTitle className="bg-[var(--charcoal-dark)] text-white p-1 rounded-md w-60">
+                Bookings Trend (7 Days)
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -237,8 +236,8 @@ export function DashboardPage() {
           </Card>
 
           <Card className="bg-white border-none shadow-md">
-            <CardHeader>
-              <CardTitle>Revenue Trend (7 Days)</CardTitle>
+            <CardHeader className=" p-2 flex justify-center">
+              <CardTitle className="bg-[var(--charcoal-dark)] text-white p-1 rounded-md text-center mb-1 w-65">Revenue Trend (7 Days)</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -299,7 +298,7 @@ export function DashboardPage() {
                         <div
                           className={`h-full rounded-full transition-all`}
                           style={{
-                            backgroundColor: "#d3d3d3",
+                            backgroundColor: "var(--charcoal-dark)",
                             width: `${percentage}%`,
                           }}
                         />

@@ -82,7 +82,6 @@ interface AdminData {
   lastName?: string;
   email?: string;
   role?: string;
-  
 }
 interface Drivers {
   id: string;
@@ -118,40 +117,39 @@ export function DriversPage() {
   // const [riders, setRiders] = useState<UserData[]>([]);
   const [rides, setRides] = useState<RideData[]>([]);
 
- useEffect(() => {
-   const unsubscribe = onAuthStateChanged(auth, async (user) => {
-     if (!user) {
-       router.push("/login");
-       return;
-     }
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        router.push("/login");
+        return;
+      }
 
-     const adminRef = doc(db, "admins", user.uid);
-     const adminSnap = await getDoc(adminRef);
+      const adminRef = doc(db, "admins", user.uid);
+      const adminSnap = await getDoc(adminRef);
 
-    if (adminSnap.exists()) {
-      const data = adminSnap.data();
+      if (adminSnap.exists()) {
+        const data = adminSnap.data();
 
-      setAdminData({
-        id: user.uid,
-        firstName: data.firstName ?? "",
-        lastName: data.lastName ?? "",
-        email: data.email ?? "",
-        role: data.role ?? "",
-        mobile: data.mobile ?? "",
-        canOverride: data.canOverride ?? false,
-      });
+        setAdminData({
+          id: user.uid,
+          firstName: data.firstName ?? "",
+          lastName: data.lastName ?? "",
+          email: data.email ?? "",
+          role: data.role ?? "",
+          mobile: data.mobile ?? "",
+          canOverride: data.canOverride ?? false,
+        });
 
-      loadAllData();
-    } else {
-      router.push("/login");
-    }
+        loadAllData();
+      } else {
+        router.push("/login");
+      }
 
+      setLoading(false);
+    });
 
-     setLoading(false);
-   });
-
-   return () => unsubscribe();
- }, []);
+    return () => unsubscribe();
+  }, []);
 
   const loadAllData = () => {
     // 🔵 Real-time: Drivers
@@ -184,7 +182,6 @@ export function DriversPage() {
       }
     );
 
-
     //  // 🟠 Real-time: Rides
 
     // Return all unsubs so you can close listeners when admin logs out or leaves page
@@ -210,26 +207,35 @@ export function DriversPage() {
   };
 
   const stats = [
-    { label: "Total Drivers", value: drivers.length, icon: UserPlus },
+    {
+      label: "Total Drivers",
+      value: drivers.length,
+      icon: UserPlus,
+      color: "text-black",
+    },
     {
       label: "Active Now",
       value: drivers.filter((d) => d.status === "active").length,
       icon: TrendingUp,
+      color: "text-green-500",
     },
     {
       label: "On Trip",
       value: drivers.filter((d) => d.status === "on-trip").length,
       icon: Calendar,
+      color: "text-grey-500",
     },
     {
       label: "Offline",
       value: drivers.filter((d) => d.status === "offline").length,
       icon: WifiOff,
+      color: "text-red-500",
     },
     {
       label: "Online",
       value: drivers.filter((d) => d.active).length,
       icon: Wifi,
+      color: "text-green-500",
     },
   ];
   const totalRevenue = drivers.reduce((sum, driver) => sum + driver.rating, 0);
@@ -276,17 +282,19 @@ export function DriversPage() {
       </div>
       <div className="p-6 space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h1
-              style={{ color: "var(--charcoal-dark)" }}
-              className="font-bold text-2xl sm:text-3xl"
-            >
+          <div className="w-full">
+            <h1 className="font-bold text-1xl sm:text-3xl bg-[var(--charcoal-dark)] text-white p-1 rounded-md w-full">
               Drivers Dashboard
             </h1>
-            <p style={{ color: "var(--charcoal-dark)" }} className="text-lg">
+            <p
+              style={{ color: "var(--charcoal-dark)" }}
+              className="text-lg pl-3"
+            >
               Manage and monitor all drivers
             </p>
           </div>
+        </div>
+        <div className="flex justify-end">
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button style={{ backgroundColor: "#2DB85B", color: "white" }}>
@@ -409,7 +417,8 @@ export function DriversPage() {
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-8 h-10 rounded-lg flex items-center justify-center">
-                      <Icon className="w-5 h-5" style={{ color: "#2DB85B" }} />
+                      
+                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
                     </div>
                     <h3 style={{ color: "#2D2D2D" }}>{stat.value}</h3>
                   </div>
@@ -472,11 +481,11 @@ export function DriversPage() {
                       </p>
                       <p className="text-sm">{driver.phone}</p>
                     </div>
-                    <div>
-                      <p className="text-sm" style={{ color: "#2D2D2D" }}>
-                        Total Trips
+                    <div className="font-bold text-lg flex items-center gap-3">
+                      <p className="font-bold" style={{ color: "#2D2D2D" }}>
+                        Total Trips:
                       </p>
-                      <p className="text-sm">{driver.totalTrips}</p>
+                      <p className="font-bold">{driver.totalTrips}</p>
                     </div>
                   </div>
 
@@ -485,7 +494,7 @@ export function DriversPage() {
                     style={{ backgroundColor: "#d3d3d3" }}
                   >
                     <Car className="w-4 h-4" style={{ color: "#2DB85B" }} />
-                    <div className="flex-1">
+                    <div className="flex gap-6">
                       <p className="text-sm">{driver.vehicleType}</p>
                       <p className="text-sm" style={{ color: "#2D2D2D" }}>
                         {driver.licensePlate}
@@ -498,30 +507,28 @@ export function DriversPage() {
                     {/* <p className="text-sm" style={{ color: '#2D2D2D' }}>{driver}</p> */}
                   </div>
 
-                  <div className="flex gap-2 pt-2">
+                  <div className="flex gap-2 pt-2 justify-end ">
                     <Button
                       size="sm"
                       variant="outline"
-                      className="flex-1"
+                      className="cursor-pointer"
                       onClick={() => {
                         setSelectedDriver(driver);
                         setIsViewDialogOpen(true);
                       }}
                     >
                       <Eye className="w-4 h-4 mr-1" />
-                      View
                     </Button>
                     <Button
                       size="sm"
                       style={{ backgroundColor: "#2DB85B", color: "white" }}
-                      className="flex-1"
+                      className="cursor-pointer"
                       onClick={() => {
                         setSelectedDriver(driver);
                         setIsMessageDialogOpen(true);
                       }}
                     >
                       <MessageSquare className="w-4 h-4 mr-1" />
-                      Message
                     </Button>
                   </div>
                 </CardContent>
