@@ -124,17 +124,24 @@ export function OperatorsPage() {
   };
 
   const stats = [
-    { label: "Total Operators", value: operators.length, icon: Users },
+    {
+      label: "Total Operators",
+      value: operators.length,
+      icon: Users,
+      color: "text-black",
+    },
     {
       label: "Active",
       value: operators.filter((o) => o.status === "active").length,
       icon: CheckCircle,
+      color: "text-green-600",
     },
     {
       label: "Inactive",
       value: operators.filter((o) => o.status === "inactive").length,
 
       icon: CircleOff,
+      color: "text-black",
     },
   ];
 
@@ -145,22 +152,18 @@ export function OperatorsPage() {
       </div>
 
       <div className="p-4 sm:p-6 space-y-6">
-        {" "}
         {/* Reduced initial padding for smaller screens */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          {" "}
-          {/* Stack elements vertically on small screens */}
-          <div>
-            <h1
-              style={{ color: "#2F3A3F" }}
-              className="font-bold text-2xl sm:text-3xl"
-            >
+          <div className="w-full">
+            <h1 className="font-bold text-1xl sm:text-3xl bg-[var(--charcoal-dark)] text-white p-1 rounded-md w-full">
               Operator Dashboard
             </h1>
-            <p style={{ color: "#2D2D2D" }}>
+            <p style={{ color: "#2D2D2D" }} className="pl-3">
               Manage operators with access to bookings and dispatch
             </p>
           </div>
+        </div>
+        <div className="flex justify-end ">
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button style={{ backgroundColor: "#2DB85B", color: "white" }}>
@@ -242,6 +245,7 @@ export function OperatorsPage() {
             </DialogContent>
           </Dialog>
         </div>
+
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 w-full h-auto gap-4 md:gap-8 lg:gap-32">
           {" "}
           {/* Changed gap and made it 2 columns on small/medium screens, 3 on large */}
@@ -255,7 +259,8 @@ export function OperatorsPage() {
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-                      <Icon className="w-5 h-5" style={{ color: "#2DB85B" }} />
+                      {/* <Icon className="w-5 h-5" style={{ color: "#2DB85B" }} /> */}
+                      <stat.icon className={`h-5 w-5 ${stat.color}`} />
                     </div>
                     <h3 style={{ color: "#2D2D2D" }}>{stat.value}</h3>
                   </div>
@@ -287,7 +292,9 @@ export function OperatorsPage() {
         </Card>
         <Card className="bg-white border-none shadow-lg rounded-lg">
           <CardHeader>
-            <CardTitle>All Operators</CardTitle>
+            <CardTitle className="bg-[var(--charcoal-dark)] text-white p-1 rounded-md w-full">
+              All Operators
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {" "}

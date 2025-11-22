@@ -222,7 +222,7 @@ export function AdminsPage() {
       label: "Active",
       value: admins.filter((a) => a.status === "active").length,
       icon: CheckCircle,
-      color: "text-black",
+      color: "text-green-600",
     },
     {
       label: "Inactive",
@@ -240,7 +240,7 @@ export function AdminsPage() {
       <div className="flex lg:hidden justify-center">
         <Logo />
       </div>
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-4">
         {/* Header and Add Admin Button */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="w-full">

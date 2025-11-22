@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import RootShell from "@/components/RootShell";
+import TopActionsBar from "@/components/TopActionsBar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,6 +39,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <TopActionsBar/>
           <RootShell />
           <Toaster />
         </ThemeProvider>
