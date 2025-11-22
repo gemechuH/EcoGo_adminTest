@@ -212,16 +212,23 @@ export function AdminsPage() {
 
   // --- Statistics Data ---
   const stats = [
-    { label: "Total Admins", value: admins.length, icon: UserCheck },
+    {
+      label: "Total Admins",
+      value: admins.length,
+      icon: UserCheck,
+      color: "text-black",
+    },
     {
       label: "Active",
       value: admins.filter((a) => a.status === "active").length,
       icon: CheckCircle,
+      color: "text-black",
     },
     {
       label: "Inactive",
       value: admins.filter((a) => a.status === "inactive").length,
       icon: CircleOff,
+      color: "text-black",
     },
   ];
 
@@ -236,14 +243,16 @@ export function AdminsPage() {
       <div className="p-6 space-y-6">
         {/* Header and Add Admin Button */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h1 style={{ color: "#2F3A3F" }} className="font-bold text-3xl">
+          <div className="w-full">
+            <h1 className="font-bold text-1xl sm:text-3xl bg-[var(--charcoal-dark)] text-white p-1 rounded-md w-full">
               Admin Dashboard
             </h1>
             <p style={{ color: "#2D2D2D" }} className="text-lg">
               Manage system administrators and permissions
             </p>
           </div>
+        </div>
+        <div className="flex justify-end">
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button style={{ backgroundColor: "#2DB85B", color: "white" }}>
@@ -324,7 +333,8 @@ export function AdminsPage() {
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-                      <Icon className="w-5 h-5" style={{ color: "#2DB85B" }} />
+                      {/* <Icon className="w-5 h-5" style={{ color: "#2DB85B" }} /> */}
+                      <stat.icon className={`h-5 w-5 ${stat.color}`} />
                     </div>
                     <h3 style={{ color: "#2D2D2D" }}>{stat.value}</h3>
                   </div>
@@ -358,7 +368,9 @@ export function AdminsPage() {
         {/* Administrators Table */}
         <Card className="bg-white border-none shadow-md rounded-lg">
           <CardHeader>
-            <CardTitle>All Administrators</CardTitle>
+            <CardTitle className="bg-[var(--charcoal-dark)] text-white p-1 rounded-md w-full">
+              All Administrators
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {/* The overflow-x-auto ensures horizontal scrolling on small screens if the table is too wide */}

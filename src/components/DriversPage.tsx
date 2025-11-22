@@ -416,8 +416,7 @@ export function DriversPage() {
               <Card key={stat.label} className="bg-white border-none shadow-md">
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-10 rounded-lg flex items-center justify-center">
-                      
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center">
                       <stat.icon className={`h-6 w-6 ${stat.color}`} />
                     </div>
                     <h3 style={{ color: "#2D2D2D" }}>{stat.value}</h3>
@@ -447,6 +446,9 @@ export function DriversPage() {
             />
           </div>
         </Card>
+        <CardTitle className="bg-[var(--charcoal-dark)] text-white p-1 rounded-md w-full">
+          All Drivers
+        </CardTitle>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredDrivers.map((driver) => {

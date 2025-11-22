@@ -215,8 +215,8 @@ export function RidersPage() {
   const getStatusColor = (status: Rider["status"]) => {
     const colors = {
       active: { bg: "#D0F5DC", text: "#1B6635" },
-      inactive: { bg: "#E6E6E6", text: "#2D2D2D" },
-      suspended: { bg: "#FEE2E2", text: "#991B1B" },
+      inactive: { bg: "#FEE2E2", text: "#991B1B" },
+      suspended: { bg: " #E6E6E6", text: " #2D2D2D" },
     };
     return colors[status];
   };
@@ -225,17 +225,29 @@ export function RidersPage() {
   const totalTrips = riders.reduce((sum, rider) => sum + rider.totalTrips, 0);
 
   const stats = [
-    { label: "Total Riders", value: riders.length, icon: UserPlus },
+    {
+      label: "Total Riders",
+      value: riders.length,
+      icon: UserPlus,
+      color: "text-black",
+    },
     {
       label: "Active Riders",
       value: riders.filter((r) => r.status === "active").length,
       icon: TrendingUp,
+      color: "text-black",
     },
-    { label: "Total Trips", value: totalTrips, icon: Calendar },
+    {
+      label: "Total Trips",
+      value: totalTrips,
+      icon: Calendar,
+      color: "text-black",
+    },
     {
       label: "Total Revenue",
-      value: `$${totalRevenue.toLocaleString()}`,
+      value: `${totalRevenue.toLocaleString()}`,
       icon: DollarSign,
+      color: "text-green-500",
     },
   ];
 
@@ -274,17 +286,18 @@ export function RidersPage() {
       <div className="flex lg:hidden justify-center">
         <Logo />
       </div>
-      <div className="p-4 sm:p-6 space-y-6"> {/* Reduced initial padding for small screens */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"> {/* Stack elements vertically on small screens */}
-          <div>
-            <h1 style={{ color: "#2F3A3F" }} className="font-bold text-2xl sm:text-3xl">
+      <div className="p-4 sm:p-6 space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="w-full">
+            <h1 className="font-bold text-1xl sm:text-3xl bg-[var(--charcoal-dark)] text-white p-1 rounded-md w-full">
               Riders Dashboard
             </h1>
-            <p style={{ color: "#2D2D2D" }} className="text-sm sm:text-lg"> {/* Reduced text size on small screens */}
+            <p style={{ color: "#2D2D2D" }} className="text-sm sm:text-lg pl-3">
               Manage and monitor all riders
             </p>
           </div>
-
+        </div>
+        <div className="flex justify-end">
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button style={{ backgroundColor: "#2DB85B", color: "white" }}>
@@ -374,22 +387,27 @@ export function RidersPage() {
           </Dialog>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 w-full h-auto gap-4 md:gap-5"> {/* Changed to 2 columns on small screens, 4 on medium/large */}
+        <div className="grid grid-cols-2 md:grid-cols-4 w-full h-auto gap-4 md:gap-5">
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
               <Card
                 key={stat.label}
-                className="bg-white border-none shadow-lg w-full" 
+                className="bg-white border-none shadow-lg w-full"
               >
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-10 rounded-lg flex items-center justify-center">
-                      <Icon className="w-5 h-5" style={{ color: "#2DB85B" }} />
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                      <stat.icon className={`h-4 w-4 ${stat.color}`} />
                     </div>
-                    <h3 style={{ color: "#2D2D2D" }} className="text-xl md:text-2xl">{stat.value}</h3> {/* Ensured value is prominent */}
+                    <h3
+                      style={{ color: "#2D2D2D" }}
+                      className="text-xl md:text-xl"
+                    >
+                      {stat.value}
+                    </h3>
                   </div>
-                  <p className="mt-4 text-sm" style={{ color: "#2D2D2D" }}> {/* Reduced margin and text size for compact view */}
+                  <p className="mt-4 text-sm" style={{ color: "#2D2D2D" }}>
                     {stat.label}
                   </p>
                 </CardContent>
@@ -397,7 +415,6 @@ export function RidersPage() {
             );
           })}
         </div>
-
         <Card className=" border-none shadow-lg rounded-lg h-16 my-5">
           <div className="relative bg-white border-none rounded-lg">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-800" />
@@ -405,7 +422,7 @@ export function RidersPage() {
               placeholder="Search riders by name, email, or ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white border-none rounded-lg focus:outline-none h-16 text-base sm:text-lg focus:ring-0 shadow-none " 
+              className="pl-10 bg-white border-none rounded-lg focus:outline-none h-16 text-base sm:text-lg focus:ring-0 shadow-none "
               style={{
                 boxShadow: "none", // removes internal shadow
                 outline: "none", // removes browser outline
@@ -413,30 +430,48 @@ export function RidersPage() {
             />
           </div>
         </Card>
-
         <Card className="bg-white border-none shadow-lg rounded-lg">
           <CardHeader>
-            <CardTitle>All Riders</CardTitle>
+            <CardTitle className="bg-[var(--charcoal-dark)] text-white p-1 rounded-md w-full">
+              All Riders
+            </CardTitle>
           </CardHeader>
-          <CardContent className="p-0"> {/* Removed padding from CardContent to allow the table to fill the space */}
-            <div className="w-full overflow-x-auto"> {/* Added overflow-x-auto to make the table scrollable horizontally */}
-              <table className="w-full min-w-[1000px]"> {/* Increased min-w to ensure table doesn't compress too much */}
+          <CardContent className="p-0">
+            <div className="w-full overflow-x-auto">
+              <table className="w-full min-w-[1000px]">
                 <thead>
                   <tr
                     style={{ borderBottomWidth: "1px", borderColor: "#E6E6E6" }}
                   >
-                    <th className="text-left p-4 whitespace-nowrap text-sm">ID</th> {/* Added whitespace-nowrap and smaller text for table headers */}
-                    <th className="text-left p-4 whitespace-nowrap text-sm">Name</th>
-                    <th className="text-left p-4 whitespace-nowrap text-sm">Contact</th>
-                    <th className="text-left p-4 whitespace-nowrap text-sm">Status</th>
-                    <th className="text-left p-4 whitespace-nowrap text-sm">Total Trips</th>
-                    <th className="text-left p-4 whitespace-nowrap text-sm">Total Spent</th>
-                    <th className="text-left p-4 whitespace-nowrap text-sm">Member Since</th>
-                    <th className="text-left p-4 whitespace-nowrap text-sm">Last Trip</th>
-                    <th className="text-right p-4 whitespace-nowrap text-sm">Actions</th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">
+                      ID
+                    </th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">
+                      Name
+                    </th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">
+                      Contact
+                    </th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">
+                      Status
+                    </th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">
+                      Total Trips
+                    </th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">
+                      Total Spent
+                    </th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">
+                      Member Since
+                    </th>
+                    <th className="text-left p-4 whitespace-nowrap text-sm">
+                      Last Trip
+                    </th>
+                    <th className="text-right p-4 whitespace-nowrap text-sm">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
-
                 <tbody>
                   {filteredRiders.map((rider, index) => (
                     <tr
@@ -446,8 +481,8 @@ export function RidersPage() {
                         borderColor: "#E6E6E6",
                       }}
                     >
-                      <td className="p-4 text-sm whitespace-nowrap"> {/* Added smaller text and nowrap to table cells */}
-                        R{String(index + 1).padStart(3, "0")}
+                      <td className="p-4 text-sm whitespace-nowrap">
+                        {String(index + 1).padStart(3, "0")}
                       </td>
 
                       <td className="p-4 text-sm whitespace-nowrap">
@@ -455,7 +490,8 @@ export function RidersPage() {
                       </td>
 
                       <td className="p-4 text-sm whitespace-nowrap">
-                        <p className="text-xs">{rider.email}</p> {/* Even smaller text for email/phone */}
+                        <p className="text-xs">{rider.email}</p>{" "}
+                        {/* Even smaller text for email/phone */}
                         <p className="text-xs" style={{ color: "#2D2D2D" }}>
                           {rider.phone}
                         </p>
@@ -465,34 +501,44 @@ export function RidersPage() {
                         <Badge
                           className={` text-black text-xs
               ${rider.status === "active" ? "bg-green-400" : ""}
-              ${rider.status === "inactive" ? "bg-gray-300" : ""}
-              ${rider.status === "suspended" ? "bg-red-400" : ""}
+              ${rider.status === "inactive" ? "bg-red-400" : ""}
+              ${rider.status === "suspended" ? "bg-gray-300" : ""}
             `}
                         >
                           {rider.status}
                         </Badge>
                       </td>
 
-                      <td className="p-4 text-sm whitespace-nowrap">{rider.totalTrips}</td>
+                      <td className="p-4 text-sm whitespace-nowrap font-bold">
+                        {rider.totalTrips}
+                      </td>
 
-                      <td className="p-4 text-sm whitespace-nowrap" style={{ color: "#2DB85B" }}>
+                      <td className="p-4 text-sm whitespace-nowrap font-bold">
                         ${rider.totalSpent.toFixed(2)}
                       </td>
 
-                      <td className="p-4 text-xs whitespace-nowrap" style={{ color: "#2D2D2D" }}>
+                      <td
+                        className="p-4 text-xs whitespace-nowrap"
+                        style={{ color: "#2D2D2D" }}
+                      >
                         {rider.memberSince
                           ? rider.memberSince.toDate().toLocaleDateString()
                           : "N/A"}
                       </td>
 
-                      <td className="p-4 text-xs whitespace-nowrap" style={{ color: "#2D2D2D" }}>
+                      <td
+                        className="p-4 text-xs whitespace-nowrap"
+                        style={{ color: "#2D2D2D" }}
+                      >
                         {rider.lastTrip
                           ? rider.lastTrip.toDate().toLocaleDateString()
                           : "N/A"}
                       </td>
 
                       <td className="p-4 whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1"> {/* Reduced gap */}
+                        <div className="flex items-center justify-end gap-1">
+                          {" "}
+                          {/* Reduced gap */}
                           <Button
                             size="icon" /* Changed to size="icon" for smaller buttons on mobile */
                             variant="outline"
@@ -503,7 +549,6 @@ export function RidersPage() {
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
-
                           <Button
                             size="icon" /* Changed to size="icon" for smaller buttons on mobile */
                             style={{
@@ -526,7 +571,6 @@ export function RidersPage() {
             </div>
           </CardContent>
         </Card>
-
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
           <DialogContent
             className="max-w-xs sm:max-w-md p-6 rounded-lg shadow-xl text-[#1E1E1E] bg-white
@@ -618,7 +662,6 @@ export function RidersPage() {
             )}
           </DialogContent>
         </Dialog>
-
         <Dialog
           open={isMessageDialogOpen}
           onOpenChange={setIsMessageDialogOpen}
