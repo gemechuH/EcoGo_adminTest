@@ -35,7 +35,7 @@ interface SidebarProps {
 // NOTE: Since I don't have access to your specific `logo` and `UserRole` imports, I will assume they work and only include necessary standard imports.
 import Image from "next/image";
 // Assuming the following import path for the logo is correct relative to the file:
-import logo from "../assets/ecogo-logo.png";
+import logo from "../app/assets/ecogo-logo.png";
 
 export function Sidebar({
   currentPage,

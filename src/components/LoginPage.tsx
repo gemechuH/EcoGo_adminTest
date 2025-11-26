@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserRole } from "@/types"; // Assuming this type is defined elsewhere
 import Image from "next/image";
 // Assuming logo is imported correctly, e.g., import logo from "../assets/ecogo-logo.png";
-import logo from "../assets/ecogo-logo.png";
+import logo from "../app/assets/ecogo-logo.png";
 
 // Define the primary brand color for EcoGo
 const ECO_GREEN = "#1CA547"; // A vibrant, clean green

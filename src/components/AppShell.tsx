@@ -24,6 +24,7 @@ import {
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { toast } from "sonner";
+import UserCreate from "./UserCreate";
 
 // Simple module-level cache to retain auth/UI state across route remounts
 let __APP_SHELL_CACHE: {
@@ -57,8 +58,8 @@ export function AppShell() {
   // Sync path -> currentPage and subscribe to Firebase Auth state
   useEffect(() => {
     if (pathname) {
-      const page = pathname.replace(/^\//, "") || "dashboard";
-      setCurrentPage(page);
+      const clean = pathname.replace(/^\/|\/$/g, "");
+      setCurrentPage(clean);
     }
 
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -105,9 +106,7 @@ export function AppShell() {
           if (pathname === "/") router.push("/dashboard");
 
           // Update cache immediately
-        __APP_SHELL_CACHE = null;
-
-
+          __APP_SHELL_CACHE = null;
         } else {
           setIsLoggedIn(false);
           setUserName("");
@@ -208,9 +207,9 @@ export function AppShell() {
       />
       <main className="flex-1 overflow-y-auto">
         {currentPage === "dashboard" && <DashboardPage />}
-        {currentPage === "users" && userRole === "admin" && <UsersPage />}
-        {currentPage === "drivers" && userRole === "admin" && <DriversPage />}
-        {currentPage === "riders" && userRole === "admin" && <RidersPage />}
+        {/* {currentPage === "users" && userRole === "admin" && <UsersPage />} */}
+        {/* {currentPage === "drivers" && userRole === "admin" && <DriversPage />} */}
+        {/* {currentPage === "riders" && userRole === "admin" && <RidersPage />} */}
         {/* {currentPage === "admins" && userRole === "admin" && <AdminsPage />} */}
         {currentPage === "admins" && <AdminsPage />}
 
@@ -218,10 +217,12 @@ export function AppShell() {
           <OperatorsPage />
         )}
         {currentPage === "bookings" && <BookingsPage />}
-        {currentPage === "refunds" && <ComingSoon />}
+        {/* {currentPage === "refunds" && <ComingSoon />} */}
         {currentPage === "safety" && <ComingSoon />}
         {currentPage === "reports" && <ReportsPage userRole={userRole} />}
         {currentPage === "settings" && userRole === "admin" && <SettingsPage />}
+
+        {currentPage === "dashboard/users/new" && <UserCreate />}
       </main>
     </div>
   );

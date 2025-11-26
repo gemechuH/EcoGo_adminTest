@@ -217,25 +217,26 @@ export function DriversPage() {
       label: "Active Now",
       value: drivers.filter((d) => d.status === "active").length,
       icon: TrendingUp,
-      color: "text-green-500",
+      color: "text-black",
     },
     {
       label: "On Trip",
       value: drivers.filter((d) => d.status === "on-trip").length,
       icon: Calendar,
-      color: "text-grey-500",
+      color: "text-green-500",
     },
-    {
-      label: "Offline",
-      value: drivers.filter((d) => d.status === "offline").length,
-      icon: WifiOff,
-      color: "text-red-500",
-    },
+
     {
       label: "Online",
       value: drivers.filter((d) => d.active).length,
       icon: Wifi,
       color: "text-green-500",
+    },
+    {
+      label: "Offline",
+      value: drivers.filter((d) => d.status === "offline").length,
+      icon: WifiOff,
+      color: "text-yellow-500",
     },
   ];
   const totalRevenue = drivers.reduce((sum, driver) => sum + driver.rating, 0);
@@ -504,34 +505,32 @@ export function DriversPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-10">
                     <MapPin className="w-4 h-4" style={{ color: "#2DB85B" }} />
-                    {/* <p className="text-sm" style={{ color: '#2D2D2D' }}>{driver}</p> */}
-                  </div>
-
-                  <div className="flex gap-2 pt-2 justify-end ">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="cursor-pointer"
-                      onClick={() => {
-                        setSelectedDriver(driver);
-                        setIsViewDialogOpen(true);
-                      }}
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      style={{ backgroundColor: "#2DB85B", color: "white" }}
-                      className="cursor-pointer"
-                      onClick={() => {
-                        setSelectedDriver(driver);
-                        setIsMessageDialogOpen(true);
-                      }}
-                    >
-                      <MessageSquare className="w-4 h-4 mr-1" />
-                    </Button>
+                    <div className="flex gap-2 pt-2 justify-end ">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="cursor-pointer"
+                        onClick={() => {
+                          setSelectedDriver(driver);
+                          setIsViewDialogOpen(true);
+                        }}
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        style={{ backgroundColor: "#2DB85B", color: "white" }}
+                        className="cursor-pointer"
+                        onClick={() => {
+                          setSelectedDriver(driver);
+                          setIsMessageDialogOpen(true);
+                        }}
+                      >
+                        <MessageSquare className="w-4 h-4 mr-1" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
