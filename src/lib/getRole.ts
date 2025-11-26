@@ -1,13 +1,20 @@
 // lib/getRole.ts
-import { adminDb } from "./firebaseAdmin";
+import { adminAuth } from "./firebaseAdmin";
 
-export async function getRoleById(roleId: string) {
+export async function getRoleById(req: Request): Promise<string> {
   try {
-    const snap = await adminDb.collection("roles").doc(roleId).get();
-    if (!snap.exists) return null;
-    return snap.data();
-  } catch (err) {
-    console.error("🔥 getRoleById error:", err);
-    return null;
+    const authHeader = req.headers.get("Authorization");
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return "guest";
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = await adminAuth.verifyIdToken(token);
+
+    return decoded.role || "guest";
+  } catch (error) {
+    return "guest";
   }
 }
+

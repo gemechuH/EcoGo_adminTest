@@ -24,7 +24,7 @@ import {
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { toast } from "sonner";
-import UserCreate from "./UserCreate";
+// import UserCreate from "./UserCreate";
 
 // Simple module-level cache to retain auth/UI state across route remounts
 let __APP_SHELL_CACHE: {
@@ -222,7 +222,7 @@ export function AppShell() {
         {currentPage === "reports" && <ReportsPage userRole={userRole} />}
         {currentPage === "settings" && userRole === "admin" && <SettingsPage />}
 
-        {currentPage === "dashboard/users/new" && <UserCreate />}
+        
       </main>
     </div>
   );

@@ -13,8 +13,15 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 // Helper → Get role from header (you can replace with auth logic)
-function getRole(request: Request) {
-  return request.headers.get("x-user-role") || "driver"; // fallback as driver
+// function getRole(request: Request) {
+//   return request.headers.get("x-user-role") || "driver"; // fallback as driver
+// }
+
+export type Role = keyof typeof ROLE_PERMISSIONS;
+
+function getRole(request: Request): Role {
+  const r = request.headers.get("x-user-role") || "driver";
+  return (r in ROLE_PERMISSIONS ? r : "driver") as Role;
 }
 
 // ========================
@@ -27,7 +34,6 @@ export async function GET(
   try {
     const role = getRole(request);
 
-    // 🔐 Permission Check (READ)
     if (!ROLE_PERMISSIONS[role]?.users.read) {
       return NextResponse.json(
         { error: "Permission denied (READ)" },
@@ -35,25 +41,12 @@ export async function GET(
       );
     }
 
-    const { id } = await context.params;
-
-    if (!id) {
-      return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
-      );
-    }
-
-    const docRef = db.collection("users").doc(id);
-    const doc = await docRef.get();
-
-    if (!doc.exists) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({ id: doc.id, ...doc.data() });
+    return NextResponse.json({ success: true });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: err.message },
+      { status: 500 }
+    );
   }
 }
 
