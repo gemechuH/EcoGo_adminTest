@@ -10,48 +10,48 @@ import {
   LogOut,
   Menu,
   X,
-  ChevronRight, // Added for dropdown arrow
-  ChevronDown, // Added for dropdown arrow
+  ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 
-// Assuming these types are defined elsewhere or passed correctly
-// type UserRole = "admin" | "operator";
-// interface SidebarProps { ... }
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { adminMenuItems, operatorMenuItems } from "./SidebarData";
 
-// Dummy types to satisfy the component if external ones aren't available for preview
 type UserRole = "admin" | "operator";
-// Note: I will use the actual imported types UserRole and logo from the original context
-// import { UserRole } from "@/types";
-// import logo from "../assets/ecogo-logo.png";
-// The following interface is included to ensure the code block is self-contained and runnable
+
 interface SidebarProps {
   currentPage: string;
-  onNavigate: (page: string) => void;
   userRole: UserRole;
   userName: string;
   onLogout: () => void;
 }
 
-// NOTE: Since I don't have access to your specific `logo` and `UserRole` imports, I will assume they work and only include necessary standard imports.
 import Image from "next/image";
-// Assuming the following import path for the logo is correct relative to the file:
 import logo from "../app/assets/ecogo-logo.png";
 
 export function Sidebar({
   currentPage,
-  onNavigate,
   userRole,
   userName,
   onLogout,
 }: SidebarProps) {
-  const [isUserMenuExpanded, setIsUserMenuExpanded] = useState(false); // Existing state for Users dropdown
+  const router = useRouter();
+
+  const handleLinkClick = (e: React.MouseEvent, href: string) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
+      return;
+    e.preventDefault();
+    setIsSidebarOpen(false);
+    router.push(href);
+  };
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // --- New Dropdown States ---
-  const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
-  const [isOperationsExpanded, setIsOperationsExpanded] = useState(false);
-  // --- End New Dropdown States ---
+  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>(
+    {}
+  );
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -68,82 +68,12 @@ export function Sidebar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isSidebarOpen]);
 
-  // Handler to close all other menus when one is opened
-  const toggleDropdown = (
-    menuId: "users" | "settings" | "operations" | "bookings"
-  ) => {
-    switch (menuId) {
-      case "users":
-        setIsUserMenuExpanded(!isUserMenuExpanded);
-        setIsSettingsExpanded(false);
-        setIsOperationsExpanded(false);
-        break;
-      case "settings":
-        setIsSettingsExpanded(!isSettingsExpanded);
-        setIsUserMenuExpanded(false);
-        setIsOperationsExpanded(false);
-        break;
-      case "operations":
-      case "bookings": // Operator uses 'bookings' but functionality is the same
-        setIsOperationsExpanded(!isOperationsExpanded);
-        setIsUserMenuExpanded(false);
-        setIsSettingsExpanded(false);
-        break;
-      default:
-        break;
-    }
+  const toggleDropdown = (menuId: string) => {
+    setExpandedMenus((prev) => ({ ...prev, [menuId]: !prev[menuId] }));
   };
 
-  const adminMenuItems = [
-    {
-      id: "dashboard",
-      label: "Admin Dashboard",
-      icon: LayoutDashboard,
-      isDropdown: false,
-    },
-    { id: "users", label: "Users", icon: Users, isDropdown: true },
-    { id: "operations", label: "Operations", icon: Calendar, isDropdown: true },
-    { id: "system", label: "System", icon: Settings, isDropdown: true },
-  ];
-
-  const operatorMenuItems = [
-    {
-      id: "dashboard",
-      label: "Operator Dashboard",
-      icon: LayoutDashboard,
-      isDropdown: false,
-    },
-    { id: "bookings", label: "Bookings", icon: Calendar, isDropdown: true }, // Mapped to isOperationsExpanded state
-    { id: "reports", label: "Reports", icon: FileText, isDropdown: false },
-  ];
-
+  // RESTORED: the original version before merge
   const menuItems = userRole === "admin" ? adminMenuItems : operatorMenuItems;
-
-  const userManagementItems = [
-    { id: "drivers", label: "Drivers", count: 4 },
-    { id: "riders", label: "Riders", count: 6 },
-    { id: "admins", label: "Admins", count: 5 },
-    { id: "operators", label: "Operators", count: 4 },
-  ];
-
-  // New Dropdown Sub-menus
-  const systemSettingsItems = [
-    { id: "sys-config", label: "Configuration" },
-    { id: "sys-api", label: "API Keys" },
-    { id: "sys-audit", label: "Audit Logs" },
-  ];
-
-  const adminOperationsItems = [
-    { id: "op-live", label: "Live Tracking" },
-    { id: "op-pending", label: "Pending Rides" },
-    { id: "op-completed", label: "Completed History" },
-  ];
-
-  const operatorBookingsItems = [
-    { id: "book-new", label: "Create New Booking" },
-    { id: "book-pending", label: "Pending/Assigned" },
-    { id: "book-history", label: "Booking History" },
-  ];
 
   return (
     <>
@@ -156,7 +86,7 @@ export function Sidebar({
         {isSidebarOpen ? "" : <Menu className="w-4 h-4" />}
       </button>
 
-      {/* Mobile Close Button (when sidebar is open) */}
+      {/* Mobile Close Button */}
       {isSidebarOpen && (
         <button
           className="md:hidden fixed top-4 right-4 z-[60] p-2 rounded text-white"
@@ -168,7 +98,7 @@ export function Sidebar({
 
       <aside
         ref={sidebarRef}
-        className={`fixed md:static top-0 left-0 h-full z-40 w-50 flex flex-col transition-transform duration-300
+        className={`fixed md:static top-0 left-0 h-full z-40 w-64 flex flex-col transition-transform duration-300
         bg-[var(--charcoal-dark)] ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
@@ -184,75 +114,145 @@ export function Sidebar({
           />
         </div>
 
-        {/* Role */}
-        {/* <div className="px-6 py-2 mb-2">
-          <span className="text-sm uppercase tracking-wide font-semibold pl-3 text-white">
-            {userRole}
-          </span>
-        </div> */}
-
         {/* Navigation */}
         <nav className="flex-1 px-3 overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
-            let isExpanded = false;
-            let subItems: { id: string; label: string; count?: number }[] = [];
-            let handler = () => onNavigate(item.id);
-            let showDropdown = item.isDropdown;
+            const isExpanded = !!expandedMenus[item.id];
+            const subItems = Array.isArray((item as any).children)
+              ? (item as any).children
+              : [];
 
-            // Determine dropdown state and sub-items based on item ID
-            if (item.id === "users") {
-              isExpanded = isUserMenuExpanded;
-              subItems = userManagementItems;
-              handler = () => toggleDropdown("users");
-            } else if (item.id === "system") {
-              isExpanded = isSettingsExpanded;
-              subItems = systemSettingsItems;
-              handler = () => toggleDropdown("settings");
-            } else if (item.id === "operations") {
-              isExpanded = isOperationsExpanded;
-              subItems = adminOperationsItems;
-              handler = () => toggleDropdown("operations");
-            } else if (item.id === "bookings") {
-              // Operator role
-              isExpanded = isOperationsExpanded;
-              subItems = operatorBookingsItems;
-              handler = () => toggleDropdown("bookings");
-            }
+            const hasActiveDescendant = (nodes: any[]): boolean => {
+              return nodes.some((n) => {
+                if (n.id === currentPage) return true;
+                if (Array.isArray(n.children) && n.children.length)
+                  return hasActiveDescendant(n.children);
+                return false;
+              });
+            };
+
+            const rowActive =
+              isActive ||
+              (subItems.length > 0 && hasActiveDescendant(subItems));
+
+            const handler = () => toggleDropdown(item.id);
+            const showDropdown = !!item.isDropdown;
 
             if (showDropdown) {
               return (
                 <div key={item.id}>
-                  <button
-                    onClick={handler}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 cursor-pointer"
+                  {/* PARENT DROPDOWN ROW */}
+                  <div
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1"
                     style={{
-                      backgroundColor: "transparent",
-                      color: isActive || isExpanded ? "#2DB85B" : "white",
+                      backgroundColor: rowActive ? "#3A4750" : "transparent",
+                      color: rowActive || isExpanded ? "#2DB85B" : "white",
                     }}
                   >
-                    <Icon className="w-4 h-4 flex-shrink-0" />
-                    <span className="flex-1 text-[13px] text-left">{item.label}</span>
-                    {isExpanded ? (
-                      <ChevronDown className="w-4 h-4" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4" />
-                    )}
-                  </button>
+                    <Icon className="w-4 h-4 shrink-0" />
 
+                    <button
+                      type="button"
+                      onClick={handler}
+                      aria-expanded={isExpanded}
+                      className="flex-1 text-sm font-semibold leading-[22px] text-left"
+                    >
+                      {item.label}
+                    </button>
+
+                    <button onClick={handler} className="p-1">
+                      {isExpanded ? (
+                        <ChevronDown className="w-4 h-4" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+
+                  {/* SUB ITEMS */}
                   {isExpanded && (
                     <div className="ml-4 mb-2 space-y-1">
-                      {subItems.map((sub) => {
+                      {subItems.map((sub: any) => {
                         const subActive = currentPage === sub.id;
+
+                        if ("children" in sub && Array.isArray(sub.children)) {
+                          const isParentExpanded = !!expandedMenus[sub.id];
+                          const parentActive = sub.children.some(
+                            (c: any) => currentPage === c.id
+                          );
+
+                          return (
+                            <div key={sub.id}>
+                              <button
+                                onClick={() => toggleDropdown(sub.id)}
+                                className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-sm"
+                                style={{
+                                  backgroundColor:
+                                    isParentExpanded || parentActive
+                                      ? "#3A4750"
+                                      : "transparent",
+                                  color:
+                                    isParentExpanded || parentActive
+                                      ? "#2DB85B"
+                                      : "white",
+                                }}
+                              >
+                                {sub.label}
+                                {isParentExpanded ? (
+                                  <ChevronDown className="w-4 h-4" />
+                                ) : (
+                                  <ChevronRight className="w-4 h-4" />
+                                )}
+                              </button>
+
+                              {isParentExpanded && (
+                                <div className="ml-4 mt-1 space-y-1">
+                                  {sub.children.map(
+                                    (child: { id: string; label: string }) => {
+                                      const childActive =
+                                        currentPage === child.id;
+
+                                      return (
+                                        <Link
+                                          key={child.id}
+                                          href={`/${child.id}`}
+                                          onClick={(e) =>
+                                            handleLinkClick(
+                                              e as any,
+                                              `/${child.id}`
+                                            )
+                                          }
+                                          className="block px-4 py-2 rounded-lg text-sm"
+                                          style={{
+                                            backgroundColor: childActive
+                                              ? "#3A4750"
+                                              : "transparent",
+                                            color: childActive
+                                              ? "#2DB85B"
+                                              : "white",
+                                          }}
+                                        >
+                                          {child.label}
+                                        </Link>
+                                      );
+                                    }
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        }
+
                         return (
-                          <button
+                          <Link
                             key={sub.id}
-                            onClick={() => {
-                              onNavigate(sub.id);
-                              setIsSidebarOpen(false);
-                            }}
-                            className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-sm transition-colors duration-150"
+                            href={`/${sub.id}`}
+                            onClick={(e) =>
+                              handleLinkClick(e as any, `/${sub.id}`)
+                            }
+                            className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-sm"
                             style={{
                               backgroundColor: subActive
                                 ? "#3A4750"
@@ -260,21 +260,8 @@ export function Sidebar({
                               color: subActive ? "#2DB85B" : "white",
                             }}
                           >
-                            <span className="text-left text-sm">{sub.label}</span>
-                            {sub.count !== undefined && (
-                              <span
-                                className="px-2 py-0.5 text-xs rounded-full"
-                                style={{
-                                  backgroundColor: subActive
-                                    ? "#2DB85B"
-                                    : "rgba(255,255,255,0.2)",
-                                  color: subActive ? "white" : "white",
-                                }}
-                              >
-                                {sub.count}
-                              </span>
-                            )}
-                          </button>
+                            <span>{sub.label}</span>
+                          </Link>
                         );
                       })}
                     </div>
@@ -283,23 +270,21 @@ export function Sidebar({
               );
             }
 
-            // Non-dropdown menu item
+            // NON-DROPDOWN ITEM
             return (
-              <button
+              <Link
                 key={item.id}
-                onClick={() => {
-                  onNavigate(item.id);
-                  setIsSidebarOpen(false);
-                }}
+                href={`/${item.id}`}
+                onClick={(e) => handleLinkClick(e as any, `/${item.id}`)}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 cursor-pointer"
                 style={{
                   backgroundColor: isActive ? "#3A4750" : "transparent",
                   color: isActive ? "#2DB85B" : "white",
                 }}
               >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <span className="text-sm">{item.label}</span>
-              </button>
+                <Icon className="w-4 h-4 shrink-0" />
+                <span className="text-sm font-semibold">{item.label}</span>
+              </Link>
             );
           })}
         </nav>
@@ -308,14 +293,11 @@ export function Sidebar({
         <div className="p-3">
           <button
             onClick={onLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg"
-            style={{
-              backgroundColor: "gray-500",
-              color: "white",
-            }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white"
+            style={{ backgroundColor: "gray" }}
           >
             <LogOut className="w-5 h-5" />
-            <span>Logout</span>
+            Logout
           </button>
         </div>
 

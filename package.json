@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate:roles": "node scripts/migrate_roles_to_dot.js"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.3",
