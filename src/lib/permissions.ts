@@ -8,11 +8,24 @@ export const ROLE_PERMISSIONS = {
       delete: true,
       approve: true,
     },
+    drivers: {
+      create: true,
+      read: true,
+      update: true,
+      delete: true,
+    },
   },
 
   admin: {
     users: { create: true, read: true, update: true, delete: false },
     vehicles: {
+      create: true,
+      read: true,
+      update: true,
+      delete: false,
+      approve: false,
+    },
+    drivers: {
       create: true,
       read: true,
       update: true,
@@ -30,11 +43,25 @@ export const ROLE_PERMISSIONS = {
       delete: false,
       approve: true,
     },
+    drivers: {
+      create: true,
+      read: true,
+      update: true,
+      delete: false,
+      approve: false,
+    },
   },
 
   it_support: {
     users: { create: false, read: true, update: true, delete: false },
     vehicles: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+      approve: false,
+    },
+    drivers: {
       create: false,
       read: true,
       update: false,
@@ -52,6 +79,13 @@ export const ROLE_PERMISSIONS = {
       delete: false,
       approve: false,
     },
+    drivers: {
+      create: true,
+      read: true,
+      update: true,
+      delete: false,
+      approve: false,
+    },
   },
 
   rider: {
@@ -63,11 +97,25 @@ export const ROLE_PERMISSIONS = {
       delete: false,
       approve: false,
     },
+    drivers: {
+      create: false,
+      read: false,
+      update: false,
+      delete: false,
+      approve: false,
+    },
   },
 
   finance: {
     users: { create: false, read: true, update: false, delete: false },
     vehicles: {
+      create: false,
+      read: true,
+      update: false,
+      delete: false,
+      approve: false,
+    },
+    drivers: {
       create: false,
       read: true,
       update: false,

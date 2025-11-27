@@ -3,15 +3,22 @@ import { adminDb } from "@/lib/firebaseAdmin";
 import { ROLE_PERMISSIONS } from "@/lib/permissions";
 import { getRoleById } from "@/lib/getRole";
 
+
+
+export type Role = keyof typeof ROLE_PERMISSIONS;
+
+function getRole(request: Request): Role {
+  const r = request.headers.get("x-user-role") || "driver";
+  return (r in ROLE_PERMISSIONS ? r : "driver") as Role;
+}
 export async function POST(req: Request) {
   try {
     // 1️⃣ Get user role from token/request
-    const role = getRoleById(req);
+    const role = getRole(req);
 
-    // 🔐 Permission Check (CREATE)
-    if (!ROLE_PERMISSIONS[role]?.users?.create) {
+    if (!ROLE_PERMISSIONS[role]?.users.read) {
       return NextResponse.json(
-        { error: "Permission denied (CREATE)" },
+        { error: "Permission denied (READ)" },
         { status: 403 }
       );
     }

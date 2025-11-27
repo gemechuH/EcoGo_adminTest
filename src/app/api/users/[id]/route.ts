@@ -109,15 +109,14 @@ export async function DELETE(
   context: { params: { id: string } }
 ) {
   try {
-    const role = getRole(request);
+   const role = getRole(request);
 
-    // 🔐 Permission Check (DELETE)
-    if (!ROLE_PERMISSIONS[role]?.users.delete) {
-      return NextResponse.json(
-        { error: "Permission denied (DELETE)" },
-        { status: 403 }
-      );
-    }
+   if (!ROLE_PERMISSIONS[role]?.users.read) {
+     return NextResponse.json(
+       { error: "Permission denied (READ)" },
+       { status: 403 }
+     );
+   }
 
     const { id } = await context.params;
 
