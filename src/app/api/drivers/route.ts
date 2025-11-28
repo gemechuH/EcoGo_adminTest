@@ -45,14 +45,8 @@ export async function GET(req: Request) {
   }
 }
 
-
-
-
-
-
 export async function POST(req: Request) {
   try {
-
     const role = getRole(req);
 
     if (!ROLE_PERMISSIONS[role]?.users.read) {
@@ -194,7 +188,7 @@ export async function POST(req: Request) {
       email,
       phone: phone || "",
       role: "driver",
-      
+
       licenseNumber,
       licenseExpiry: licenseExpiry || null,
       drivingExperienceYears: drivingExperienceYears || 0,
@@ -236,4 +230,3 @@ export async function POST(req: Request) {
     );
   }
 }
-

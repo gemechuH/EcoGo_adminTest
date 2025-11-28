@@ -3,8 +3,6 @@ import { adminDb } from "@/lib/firebaseAdmin";
 import { ROLE_PERMISSIONS } from "@/lib/permissions";
 import { getRoleById } from "@/lib/getRole";
 
-
-
 export type Role = keyof typeof ROLE_PERMISSIONS;
 
 function getRole(request: Request): Role {

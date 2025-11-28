@@ -31,13 +31,13 @@ export async function GET(
 ) {
   try {
     const role = getRole(req);
-    
-        if (!ROLE_PERMISSIONS[role]?.users.read) {
-          return NextResponse.json(
-            { error: "Permission denied (READ)" },
-            { status: 403 }
-          );
-        }
+
+    if (!ROLE_PERMISSIONS[role]?.users.read) {
+      return NextResponse.json(
+        { error: "Permission denied (READ)" },
+        { status: 403 }
+      );
+    }
     const { id } = await context.params; // ✅ FIXED
 
     if (!id) {
@@ -157,9 +157,6 @@ export async function PATCH(
   }
 }
 
-
-
-
 export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -206,5 +203,3 @@ export async function DELETE(
     );
   }
 }
-
-

@@ -26,7 +26,6 @@ export async function GET(
   }
 }
 
-
 export async function PATCH(
   req: Request,
   context: { params: Promise<{ id: string }> }
@@ -58,9 +57,6 @@ export async function PATCH(
     );
   }
 }
-
-
-
 
 export async function DELETE(
   req: Request,

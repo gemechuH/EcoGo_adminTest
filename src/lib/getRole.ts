@@ -17,4 +17,3 @@ export async function getRoleById(req: Request): Promise<string> {
     return "guest";
   }
 }
-
