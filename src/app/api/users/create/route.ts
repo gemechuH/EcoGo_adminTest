@@ -14,9 +14,9 @@ export async function POST(req: Request) {
     // 1️⃣ Get user role from token/request
     const role = getRole(req);
 
-    if (!ROLE_PERMISSIONS[role]?.users.read) {
+    if (!ROLE_PERMISSIONS[role]?.users.create) {
       return NextResponse.json(
-        { error: "Permission denied (READ)" },
+        { error: "Permission denied (CREATE)" },
         { status: 403 }
       );
     }
