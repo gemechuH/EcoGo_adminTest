@@ -33,7 +33,6 @@ export default function DeleteOperator({ operatorId }: any) {
         variant="ghost"
         onClick={() => setOpen(true)}
         className=" cursor-pointer"
-        
       >
         <Trash2 className="w-4 h-4 text-red-600 " />
       </Button>

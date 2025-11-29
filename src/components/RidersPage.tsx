@@ -2,10 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+// import {DeleteRider} from './operation/DeleteRider'
+import  EditRider  from "./operation/EditRider";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Badge } from "../components/ui/badge";
+import { Edit, Loader2, MessageCircle } from "lucide-react";
 
 import {
   Dialog,
@@ -14,9 +22,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+} from "../components/ui/dialog";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
 import {
   Search,
   UserPlus,
@@ -40,6 +48,7 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import Logo from "./Logo";
+import DeleteRider from './operation/DeleteRider';
 
 interface Rider {
   id: string;
@@ -74,8 +83,8 @@ interface AdminData {
   role?: string;
 }
 
-export function RidersPage() {
-  const [riders, setRiders] = useState<Rider[]>([]);
+export function RidersPage({ onClose, onCreated }: any) {
+  // const [riders, setRiders] = useState<Rider[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedRider, setSelectedRider] = useState<Rider | null>(null);
@@ -83,120 +92,120 @@ export function RidersPage() {
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
   const [messageText, setMessageText] = useState("");
   const [adminData, setAdminData] = useState<AdminData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [riders, setRiders] = useState<any[]>([]);
   // const [riders, setRiders] = useState<UserData[]>([]);
   const [rides, setRides] = useState<RideData[]>([]);
+   const [form, setForm] = useState({
+     name: "",
+     phone: "",
+     email: "",
+   });
+  // const fetchRiders = async (role: string) => {
+  //   try {
+  //     const res = await fetch("/api/riders", {
+  //       headers: {
+  //         "x-user-role": role,
+  //       },
+  //     });
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        router.push("/login");
-        return;
-      }
+  //     // Log the response status to console for debugging
+  //     console.log("Riders API Response Status:", res.status);
 
-      const adminRef = doc(db, "admins", user.uid);
-      const adminSnap = await getDoc(adminRef);
+  //     const json = await res.json();
 
-      // useEffect(() => {
-      // 	 const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      // 	 	 if (!user) {
-      // 	 	 	 router.push("/riders");
-      // 	 	 	 return;
-      // 	 	 }
+  //     // Log the received JSON data
+  //     console.log("Riders API Response Data:", json);
 
-      // 	 	 const adminRef = doc(db, "admins", user.uid);
-      // 	 	 const adminSnap = await getDoc(adminRef);
+  //     if (json.success && Array.isArray(json.riders)) {
+  //       const formatted: Rider[] = json.riders.map((r: any) => ({
+  //         ...r,
+  //         // memberSince: convertToJsDate(r.memberSince),
+  //         // lastTrip: convertToJsDate(r.lastTrip),
+  //         phone: r.mobile ?? r.phone ?? "",
+  //         status: r.status ?? "inactive",
+  //         totalTrips: typeof r.totalTrips === "number" ? r.totalTrips : 0,
+  //         totalSpent: typeof r.totalSpent === "number" ? r.totalSpent : 0,
+  //       }));
 
-      // 	 	 if (adminSnap.exists()) {
-      // 	 	 	 const data = adminSnap.data();
-
-      // 	 	 	 setAdminData({
-      // 	 	 	 	 id: user.uid,
-      // 	 	 	 	 ...data,
-      // 	 	 	 } as AdminData);
-
-      // 	 	 	 loadAllData();
-      // 	 	 } else {
-      // 	 	 	 router.push("/login");
-      // 	 	 }
-
-      // 	 	 setLoading(false);
-      // 	 });
-
-      // 	 return () => unsubscribe();
-      // }, []);
-      if (adminSnap.exists()) {
-        const data = adminSnap.data();
-
-        setAdminData({
-          id: user.uid,
-          firstName: data.firstName ?? "",
-          lastName: data.lastName ?? "",
-          email: data.email ?? "",
-          role: data.role ?? "",
-          mobile: data.mobile ?? "",
-          canOverride: data.canOverride ?? false,
-        });
-
-        loadAllData();
-      } else {
-        router.push("/login");
-      }
-
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-  const loadAllData = () => {
-    // 🔵 Real-time: Drivers
-
-    // 🟢 Real-time: Riders
-    const unsubscribeRides = onSnapshot(collection(db, "rides"), (snapshot) => {
-      setRides(
-        snapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            pickup: data.pickup ?? "",
-            destination: data.destination ?? "",
-            name: data.name ?? "",
-            fare: data.fare ?? 0,
-            status: data.status ?? "pending",
-            riderId: data.riderId ?? "",
-            driverId: data.driverId ?? "",
-          } satisfies RideData;
-        })
-      );
-    });
-
-    // 🟠 Real-time: Rides
-    const unsubscribeRiders = onSnapshot(
-      collection(db, "riders"),
-      (snapshot) => {
-        setRiders(
-          snapshot.docs.map((doc) => ({
-            id: doc.id,
-            name: doc.data().name ?? "",
-            email: doc.data().email ?? "",
-            phone: doc.data().phone ?? "",
-            totalTrips: doc.data().totalTrips ?? 0,
-            totalSpent: doc.data().totalSpent ?? 0,
-            memberSince: doc.data().memberSince ?? "",
-            lastTrip: doc.data().lastTrip ?? "",
-            status: doc.data().status ?? "inactive",
-          })) as Rider[]
-        );
-      }
-    );
-
-    // Return all unsubs so you can close listeners when admin logs out or leaves page
-    return () => {
-      unsubscribeRiders();
-      unsubscribeRides();
-    };
+  //       setRiders(formatted);
+  //     } else {
+  //       // Log error if success is false or riders is not an array
+  //       console.error(
+  //         "Riders API returned success: false or invalid data structure:",
+  //         json
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to fetch riders from API:", error);
+  //   }
+  // };
+  const fetchRiders = async () => {
+    setLoading(true);
+    const res = await fetch("/api/riders");
+    const data = await res.json();
+    setRiders(data.riders || []);
+    setLoading(false);
   };
+
+  //  useEffect(() => {
+  
+//    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+//      if (!user) {
+//        router.push("/login");
+//        return;
+//      }
+
+//      // Try admins, users, and super_admins collections
+//      const collections = ["admins", "users", "super_admins"];
+//      let found = false;
+//      let data = null;
+//      let role = ""; // Store the determined role
+
+//      for (const col of collections) {
+//        const ref = doc(db, col, user.uid);
+//        const snap = await getDoc(ref);
+//        if (snap.exists()) {
+//          data = snap.data();
+//          role = data.role ?? ""; // Capture the role
+//          found = true;
+//          break;
+//        }
+//      }
+
+//      if (found && data) {
+//        const adminProfile = {
+//          id: user.uid,
+//          firstName: data.firstName ?? "",
+//          lastName: data.lastName ?? "",
+//          email: data.email ?? "",
+//          role: role,
+//          mobile: data.mobile ?? "",
+//          canOverride: data.canOverride ?? false,
+//        };
+
+//        setAdminData(adminProfile);
+
+//        // 🎯 FIX: Call fetchRiders immediately upon successful authentication
+//        // and retrieval of the user role.
+//        if (role) {
+//          fetchRiders(role);
+//        }
+//      } else {
+//        router.push("/login");
+//      }
+
+//      setLoading(false);
+//    });
+
+//    return () => unsubscribe();
+//  }, [router]);
+  
+   useEffect(() => {
+     fetchRiders();
+   }, []);
+  
 
   const filteredRiders = riders.filter(
     (rider) =>
@@ -262,6 +271,22 @@ export function RidersPage() {
     setRiders([...riders, newRider]);
     setIsAddDialogOpen(false);
     toast.success(`Rider ${newRider.name} added successfully!`);
+  };
+  const createRider = async () => {
+    setLoading(true);
+    const res = await fetch("/api/riders", {
+      method: "POST",
+      body: JSON.stringify(form),
+    });
+    const data = await res.json();
+    setLoading(false);
+
+    if (data.success) {
+      onCreated();
+      onClose();
+    } else {
+      alert(data.error || data.message);
+    }
   };
 
   const handleSendMessage = () => {
@@ -330,6 +355,7 @@ export function RidersPage() {
                     placeholder="Gem hund"
                     required
                     className="bg-[#ffffff] text-[#1E1E1E] border border-[#444]"
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
                   />
                 </div>
 
@@ -344,6 +370,9 @@ export function RidersPage() {
                     placeholder="gem@ecogo.ca"
                     required
                     className="bg-[#ffffff] text-[#1E1E1E] border border-[#444]"
+                    onChange={(e) =>
+                      setForm({ ...form, email: e.target.value })
+                    }
                   />
                 </div>
 
@@ -357,6 +386,9 @@ export function RidersPage() {
                     placeholder="+1 416-555-0000"
                     required
                     className="bg-[#ffffff] text-[#1E1E1E] border border-[#444]"
+                    onChange={(e) =>
+                      setForm({ ...form, phone: e.target.value })
+                    }
                   />
                 </div>
 
@@ -371,8 +403,14 @@ export function RidersPage() {
                   <Button
                     type="submit"
                     style={{ backgroundColor: "#2DB85B", color: "white" }}
+                    onClick={createRider}
                   >
-                    Add Rider
+                    {/* Add Rider */}
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      "Save"
+                    )}
                   </Button>
                 </div>
               </form>
@@ -466,7 +504,7 @@ export function RidersPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredRiders.map((rider, index) => (
+                  {riders.map((rider: any, index) => (
                     <tr
                       key={rider.id}
                       style={{
@@ -507,25 +545,25 @@ export function RidersPage() {
                       </td>
 
                       <td className="p-4 text-sm whitespace-nowrap font-bold">
-                        ${rider.totalSpent.toFixed(2)}
+                        {/* ${rider.totalSpent.toFixed(2)} */}
                       </td>
 
                       <td
                         className="p-4 text-xs whitespace-nowrap"
                         style={{ color: "#2D2D2D" }}
                       >
-                        {rider.memberSince
+                        {/* {rider.memberSince
                           ? rider.memberSince.toDate().toLocaleDateString()
-                          : "N/A"}
+                          : "N/A"} */}
                       </td>
 
                       <td
                         className="p-4 text-xs whitespace-nowrap"
                         style={{ color: "#2D2D2D" }}
                       >
-                        {rider.lastTrip
+                        {/* {rider.lastTrip
                           ? rider.lastTrip.toDate().toLocaleDateString()
-                          : "N/A"}
+                          : "N/A"} */}
                       </td>
 
                       <td className="p-4 whitespace-nowrap">
@@ -543,7 +581,22 @@ export function RidersPage() {
                             <Eye className="w-4 h-4" />
                           </Button>
                           <Button
-                            size="icon" /* Changed to size="icon" for smaller buttons on mobile */
+                            size="icon"
+                            style={{
+                              backgroundColor: "#2DB85B",
+                              color: "white",
+                            }}
+                            // onClick={() => {
+                            //   setSelectedRider(rider);
+                            //   setIsMessageDialogOpen(true);
+                            // }}
+                          >
+                            {/* i need to edit econ */}
+                            {/* <Edit className="w-4 h-4" /> */}
+                            <EditRider rider={rider} onUpdated={fetchRiders} />
+                          </Button>
+                          {/* <Button
+                            size="icon"
                             style={{
                               backgroundColor: "#2DB85B",
                               color: "white",
@@ -553,7 +606,24 @@ export function RidersPage() {
                               setIsMessageDialogOpen(true);
                             }}
                           >
-                            <MessageSquare className="w-4 h-4" />
+                            
+                            <MessageCircle className="w-4 h-4" />
+                          </Button> */}
+                          <Button
+                            size="icon" /* Changed to size="icon" for smaller buttons on mobile */
+                            // style={{
+                            //   backgroundColor: "red",
+                            //   color: "white",
+                            // }}
+                            onClick={() => {
+                              setSelectedRider(rider);
+                              setIsMessageDialogOpen(true);
+                            }}
+                          >
+                            <DeleteRider
+                              rider={rider}
+                              onDeleted={fetchRiders}
+                            />
                           </Button>
                         </div>
                       </td>
@@ -587,8 +657,8 @@ export function RidersPage() {
                   </div>
                   <Badge
                     style={{
-                      backgroundColor: getStatusColor(selectedRider.status).bg,
-                      color: getStatusColor(selectedRider.status).text,
+                      // backgroundColor: getStatusColor(selectedRider.status).bg,
+                      // color: getStatusColor(selectedRider.status).text,
                     }}
                   >
                     {selectedRider.status}
@@ -615,7 +685,7 @@ export function RidersPage() {
                       Total Spent
                     </p>
                     <h4 style={{ color: "#2DB85B" }}>
-                      ${selectedRider.totalSpent.toFixed(2)}
+                      {/* ${selectedRider.totalSpent.toFixed(2)} */}
                     </h4>
                   </div>
                 </div>
