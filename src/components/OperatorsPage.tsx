@@ -1,6 +1,9 @@
 "use client";
+import { useEffect, useState } from "react";
+import EditOperator from "./operation/EditOperator";
+import DeleteOperator from "./operation/DeleteOperator";
 
-import { useState } from "react";
+
 import {
   Card,
   CardContent,
@@ -36,63 +39,74 @@ import { User } from "@/types";
 import { toast } from "sonner";
 import Logo from "./Logo";
 
-const mockOperators: User[] = [
-  {
-    id: "1",
-    uid: "2",
-    name: "Heyru Jemal",
-    email: "operator@ecogo.ca",
-    role: "operator",
-    status: "active",
-    createdAt: "2024-03-10",
-    lastLogin: "2025-11-15T08:15:00",
-  },
-  {
-    id: "2",
-    uid: "2",
-    name: "Alex Thompson",
-    email: "alex.thompson@ecogo.ca",
-    role: "operator",
-    status: "active",
-    createdAt: "2024-03-10",
-    lastLogin: "2025-11-15T08:15:00",
-  },
-  {
-    id: "3",
-    uid: "3",
-    name: "Jessica Martinez",
-    email: "jessica.m@ecogo.ca",
-    role: "operator",
-    status: "inactive",
-    createdAt: "2024-03-15",
-    lastLogin: "2025-11-15T07:30:00",
-  },
-  {
-    id: "4",
-    uid: "4",
-    name: "David Lee",
-    email: "david.lee@ecogo.ca",
-    role: "operator",
-    status: "active",
-    createdAt: "2024-04-01",
-    lastLogin: "2025-11-14T18:45:00",
-  },
-  {
-    id: "5",
-    uid: "5",
-    name: "Rachel Green",
-    email: "rachel.g@ecogo.ca",
-    role: "operator",
-    status: "inactive",
-    createdAt: "2024-04-20",
-    lastLogin: "2025-11-15T06:20:00",
-  },
-];
+// const mockOperators: User[] = [
+//   {
+//     id: "1",
 
-export function OperatorsPage() {
-  const [operators, setOperators] = useState<User[]>(mockOperators);
+//     uid: "2",
+//     name: "Heyru Jemal",
+//     email: "operator@ecogo.ca",
+//     role: "operator",
+//     status: "active",
+//     createdAt: "2024-03-10",
+//     lastLogin: "2025-11-15T08:15:00",
+//   },
+//   {
+//     id: "2",
+//     uid: "2",
+//     name: "Alex Thompson",
+//     email: "alex.thompson@ecogo.ca",
+//     role: "operator",
+//     status: "active",
+//     createdAt: "2024-03-10",
+//     lastLogin: "2025-11-15T08:15:00",
+//   },
+//   {
+//     id: "3",
+//     uid: "3",
+//     name: "Jessica Martinez",
+//     email: "jessica.m@ecogo.ca",
+//     role: "operator",
+//     status: "inactive",
+//     createdAt: "2024-03-15",
+//     lastLogin: "2025-11-15T07:30:00",
+//   },
+//   {
+//     id: "4",
+//     uid: "4",
+//     name: "David Lee",
+//     email: "david.lee@ecogo.ca",
+//     role: "operator",
+//     status: "active",
+//     createdAt: "2024-04-01",
+//     lastLogin: "2025-11-14T18:45:00",
+//   },
+//   {
+//     id: "5",
+//     uid: "5",
+//     name: "Rachel Green",
+//     email: "rachel.g@ecogo.ca",
+//     role: "operator",
+//     status: "inactive",
+//     createdAt: "2024-04-20",
+//     lastLogin: "2025-11-15T06:20:00",
+//   },
+// ];
+
+export function OperatorsPage({ refresh, onCreated,  operatorId }: any) {
+  // const [operators, setOperators] = useState<User[]>(mockOperators);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [operators, setOperators] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ fullName: "", email: "", phone: "" });
+  const [loading, setLoading] = useState(false);
+  //  const [form, setForm] = useState({
+  //    fullName: operator.fullName,
+  //    email: operator.email,
+  //    phone: operator.phone,
+  //  });
 
   const filteredOperators = operators.filter(
     (operator) =>
@@ -104,6 +118,7 @@ export function OperatorsPage() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const newOperator: User = {
+      roleId: `${operators.length + 1}`,
       id: `${operators.length + 1}`,
       uid: `${operators.length + 1}`,
 
@@ -144,6 +159,56 @@ export function OperatorsPage() {
       color: "text-black",
     },
   ];
+  useEffect(() => {
+    const fetchOps = async () => {
+      const res = await fetch("/api/operators");
+      const data = await res.json();
+
+      if (data.success) {
+        setOperators(data.operators);
+      }
+      setIsLoaded(true);
+    };
+
+    fetchOps();
+  }, [refresh]);
+
+  const submit = async () => {
+    setLoading(true);
+
+    const res = await fetch("/api/operators", {
+      method: "POST",
+      body: JSON.stringify(form),
+    });
+
+    const data = await res.json();
+    setLoading(false);
+
+    if (data.success) {
+      setOpen(false);
+      onCreated();
+    } else {
+      alert(data.error);
+    }
+  };
+  const update = async () => {
+    setLoading(true);
+
+    const res = await fetch(`/api/operators/${operatorId}`, {
+      method: "PUT",
+      body: JSON.stringify(form),
+    });
+
+    const data = await res.json();
+    setLoading(false);
+
+    if (data.success) {
+      alert("Updated Successfully");
+      location.reload(); // refresh table
+    } else {
+      alert(data.error);
+    }
+  };
 
   return (
     <div className="bg-white min-h-screen border-none shadow-md rounded-lg p-4">
@@ -201,6 +266,9 @@ export function OperatorsPage() {
                     placeholder="Gem hund"
                     required
                     className="bg-[#ffffff] text-[#1E1E1E] border border-[#444]"
+                    onChange={(e) =>
+                      setForm({ ...form, fullName: e.target.value })
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -214,6 +282,25 @@ export function OperatorsPage() {
                     placeholder="gem@ecogo.ca"
                     required
                     className="bg-[#ffffff] text-[#1E1E1E] border border-[#444]"
+                    onChange={(e) =>
+                      setForm({ ...form, email: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-white">
+                    Phone Number
+                  </Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    placeholder="(123) 456-7890"
+                    required
+                    className="bg-[#ffffff] text-[#1E1E1E] border border-[#444]"
+                    onChange={(e) =>
+                      setForm({ ...form, phone: e.target.value })
+                    }
                   />
                 </div>
                 <div
@@ -237,6 +324,7 @@ export function OperatorsPage() {
                   <Button
                     type="submit"
                     style={{ backgroundColor: "#2DB85B", color: "white" }}
+                    onClick={submit}
                   >
                     Create Operator
                   </Button>
@@ -309,7 +397,9 @@ export function OperatorsPage() {
                   <tr
                     style={{ borderBottomWidth: "1px", borderColor: "#E6E6E6" }}
                   >
-                    <th className="text-left p-4 whitespace-nowrap">Name</th>{" "}
+                    <th className="text-left p-4 whitespace-nowrap">
+                      FullName
+                    </th>{" "}
                     {/* Added whitespace-nowrap to prevent column headers from wrapping */}
                     <th className="text-left p-4 whitespace-nowrap">Email</th>
                     <th className="text-left p-4 whitespace-nowrap">Status</th>
@@ -323,9 +413,9 @@ export function OperatorsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredOperators.map((operator) => (
+                  {operators.map((op: any) => (
                     <tr
-                      key={operator.id}
+                      key={op.id}
                       style={{
                         borderBottomWidth: "1px",
                         borderColor: "#E6E6E6",
@@ -337,49 +427,45 @@ export function OperatorsPage() {
                             className="w-4 h-4"
                             style={{ color: "#2DB85B" }}
                           />
-                          <span>{operator.name}</span>
+                          <span>{op.fullName}</span>
                         </div>
                       </td>
-                      <td className="p-4 whitespace-nowrap">
-                        {operator.email}
-                      </td>
+                      <td className="p-4 whitespace-nowrap">{op.email}</td>
                       <td className="p-4 whitespace-nowrap">
                         <Badge
                           style={
-                            operator.status === "active"
+                            op.status === "active"
                               ? { backgroundColor: "#D0F5DC", color: "#1B6635" }
                               : { backgroundColor: "#E6E6E6", color: "#2D2D2D" }
                           }
                         >
-                          {operator.status}
+                          {op.status}
                         </Badge>
                       </td>
                       <td
                         className="p-4 text-sm whitespace-nowrap"
                         style={{ color: "#2D2D2D" }}
                       >
-                        {new Date(operator.createdAt).toLocaleDateString()}
+                        {new Date(op.createdAt).toLocaleDateString()}
                       </td>
                       <td
                         className="p-4 text-sm whitespace-nowrap"
                         style={{ color: "#2D2D2D" }}
                       >
-                        {operator.lastLogin
-                          ? new Date(operator.lastLogin).toLocaleString()
+                        {op.lastLogin
+                          ? new Date(op.lastLogin).toLocaleString()
                           : "Never"}
                       </td>
                       <td className="p-4 whitespace-nowrap">
                         <div className="flex items-center justify-end gap-2">
                           <Button size="sm" variant="ghost">
                             <Edit className="w-4 h-4" />
+                            <EditOperator operator={op} />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDeleteOperator(operator.id)}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-600" />
-                          </Button>
+                          
+                            
+                            <DeleteOperator operatorId={op.id} />
+                          
                         </div>
                       </td>
                     </tr>
