@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import * as admin from "firebase-admin";
 import { ROLE_PERMISSIONS } from "@/lib/permissions";
 
@@ -14,7 +14,7 @@ const db = admin.firestore();
 
 export type Role = keyof typeof ROLE_PERMISSIONS;
 
-function getRole(request: Request): Role {
+function getRole(request: NextRequest): Role {
   const r = request.headers.get("x-user-role") || "driver";
   return (r in ROLE_PERMISSIONS ? r : "driver") as Role;
 }
@@ -23,7 +23,7 @@ function getRole(request: Request): Role {
 // GET /api/users/:id
 // ========================
 export async function GET(
-  request: Request,
+  request: NextRequest,
   context: { params: { id: string } }
 ) {
   try {
@@ -46,10 +46,10 @@ export async function GET(
 }
 
 // ========================
-// UPDATE /api/users/:id (PATCH)
+// UPDATE (PATCH)
 // ========================
 export async function PATCH(
-  request: Request,
+  request: NextRequest,
   context: { params: { id: string } }
 ) {
   try {
@@ -62,7 +62,7 @@ export async function PATCH(
       );
     }
 
-    const { id } = context.params; // ✅ FIXED
+    const { id } = context.params;
     const body = await request.json();
 
     if (!id) {
@@ -96,10 +96,10 @@ export async function PATCH(
 }
 
 // ========================
-// DELETE /api/users/:id
+// DELETE
 // ========================
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   context: { params: { id: string } }
 ) {
   try {
@@ -112,7 +112,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = context.params; // ✅ FIXED
+    const { id } = context.params;
 
     if (!id) {
       return NextResponse.json(
