@@ -12,11 +12,6 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
-// Helper → Get role from header (you can replace with auth logic)
-// function getRole(request: Request) {
-//   return request.headers.get("x-user-role") || "driver"; // fallback as driver
-// }
-
 export type Role = keyof typeof ROLE_PERMISSIONS;
 
 function getRole(request: Request): Role {
@@ -60,7 +55,6 @@ export async function PATCH(
   try {
     const role = getRole(request);
 
-    // 🔐 Permission Check (UPDATE)
     if (!ROLE_PERMISSIONS[role]?.users.update) {
       return NextResponse.json(
         { error: "Permission denied (UPDATE)" },
@@ -68,7 +62,7 @@ export async function PATCH(
       );
     }
 
-    const { id } = await context.params;
+    const { id } = context.params; // ✅ FIXED
     const body = await request.json();
 
     if (!id) {
@@ -109,16 +103,16 @@ export async function DELETE(
   context: { params: { id: string } }
 ) {
   try {
-   const role = getRole(request);
+    const role = getRole(request);
 
-   if (!ROLE_PERMISSIONS[role]?.users.read) {
-     return NextResponse.json(
-       { error: "Permission denied (READ)" },
-       { status: 403 }
-     );
-   }
+    if (!ROLE_PERMISSIONS[role]?.users.read) {
+      return NextResponse.json(
+        { error: "Permission denied (READ)" },
+        { status: 403 }
+      );
+    }
 
-    const { id } = await context.params;
+    const { id } = context.params; // ✅ FIXED
 
     if (!id) {
       return NextResponse.json(
