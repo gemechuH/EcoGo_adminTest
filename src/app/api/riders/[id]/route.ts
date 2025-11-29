@@ -3,18 +3,14 @@ import { adminDb } from "@/lib/firebaseAdmin";
 // import { getRole } from "@/lib/auth";
 import { ROLE_PERMISSIONS } from "@/lib/permissions";
 
-
-
 export type Role = keyof typeof ROLE_PERMISSIONS;
 
 function getRole(request: Request): Role {
   const r = request.headers.get("x-user-role") || "driver";
   return (r in ROLE_PERMISSIONS ? r : "driver") as Role;
 }
-export async function GET(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+
+export async function GET(req: Request, context: { params: { id: string } }) {
   try {
     // const role = getRole(req);
 
@@ -25,7 +21,7 @@ export async function GET(
     //   );
     // }
 
-    const { id } = await context.params;
+    const { id } = context.params;
 
     if (!id) {
       return NextResponse.json(
@@ -55,10 +51,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: Request, context: { params: { id: string } }) {
   try {
     // const role = getRole(req);
 
@@ -68,7 +61,7 @@ export async function PATCH(
     //     { status: 403 }
     //   );
     // }
-    const { id } = await context.params;
+    const { id } = context.params;
 
     const updates = await req.json();
 
@@ -116,7 +109,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: { id: string } }
 ) {
   try {
     // const role = getRole(req);
@@ -128,7 +121,7 @@ export async function DELETE(
     //   );
     // }
 
-    const { id } = await context.params;
+    const { id } = context.params;
 
     const riderRef = adminDb.collection("riders").doc(id);
     const doc = await riderRef.get();

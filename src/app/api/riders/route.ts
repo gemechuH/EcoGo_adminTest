@@ -153,7 +153,7 @@ export async function POST(
     );
   }
 }
-export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
+export async function GET(req: Request) {
   try {
     // const role = getRole(req);
 
