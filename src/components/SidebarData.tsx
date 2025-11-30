@@ -225,32 +225,32 @@ export const menuItems: MenuItem[] = [
       { id: "reports/payout-reports", label: "Payout Reports" },
     ],
   },
-  {
-    id: "settings",
-    label: "Settings",
-    icon: Settings,
-    isDropdown: true,
-    requiredPermission: { resource: "settings", action: "read" },
-    children: [
-      {
-        id: "settings/general",
-        label: "General",
-        children: [
-          { id: "settings/general/system", label: "System" },
-          { id: "settings/general/profile", label: "Profile" },
-        ],
-      },
-      { id: "settings/config", label: "Configuration" },
-      {
-        id: "settings/pricing",
-        label: "Pricing Rules",
-        requiredPermission: { resource: "pricing", action: "read" },
-      },
-      { id: "settings/notifications", label: "Notification Settings" },
-      { id: "settings/api", label: "API Keys" },
-      { id: "settings/audit", label: "Audit Logs" },
-    ],
-  },
+  // {
+  //   id: "settings",
+  //   label: "Settings",
+  //   icon: Settings,
+  //   isDropdown: true,
+  //   requiredPermission: { resource: "settings", action: "read" },
+  //   children: [
+  //     {
+  //       id: "settings/general",
+  //       label: "General",
+  //       children: [
+  //         { id: "settings/general/system", label: "System" },
+  //         { id: "settings/general/profile", label: "Profile" },
+  //       ],
+  //     },
+  //     { id: "settings/config", label: "Configuration" },
+  //     {
+  //       id: "settings/pricing",
+  //       label: "Pricing Rules",
+  //       requiredPermission: { resource: "pricing", action: "read" },
+  //     },
+  //     { id: "settings/notifications", label: "Notification Settings" },
+  //     { id: "settings/api", label: "API Keys" },
+  //     { id: "settings/audit", label: "Audit Logs" },
+  //   ],
+  // },
 
   {
     id: "core-wallet",
