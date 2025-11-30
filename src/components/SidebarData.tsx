@@ -43,7 +43,7 @@ export interface MenuItem {
 export const menuItems: MenuItem[] = [
   {
     id: "dashboard",
-    label: "Dashboard",
+    label: "Admin Dashboard",
     icon: LayoutDashboard,
     isDropdown: false,
     requiredPermission: { resource: "dashboard", action: "view" },

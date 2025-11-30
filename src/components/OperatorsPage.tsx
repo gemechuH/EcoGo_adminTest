@@ -13,7 +13,6 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -235,7 +234,7 @@ export function OperatorsPage({ refresh, onCreated }: any) {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="w-full">
-            <h1 className="font-bold text-1xl sm:text-2xl bg-[var(--charcoal-dark)] text-white p-1 rounded-md w-full">
+            <h1 className="font-bold text-1xl sm:text-2xl bg-[#2F3A3F] text-white p-1 rounded-md w-full">
               Operator Dashboard
             </h1>
             <p style={{ color: "#2D2D2D" }} className="pl-3">
@@ -448,7 +447,7 @@ export function OperatorsPage({ refresh, onCreated }: any) {
                         className="p-4 text-sm whitespace-nowrap"
                         style={{ color: "#2D2D2D" }}
                       >
-                        {formatCanadaDate(op.createdAt)} 
+                        {formatCanadaDate(op.createdAt)}
                       </td>
                       <td
                         className="p-4 text-sm whitespace-nowrap"
