@@ -4,17 +4,7 @@ import React from "react";
 import { Clock } from "lucide-react";
 import { BRAND_COLORS } from "../lib/brandColors";
 
-// --- START BRAND_COLORS PLACEHOLDER ---
-// Using assumed values based on the "EcoGo" context and general UI best practices.
-// const BRAND_COLORS = {
-//   ecoGreen: "#1CA547", // The vibrant EcoGo Green
-//   white: "#FFFFFF",
-//   darkCharcoal: "#2F3A3F", // Used for Headings (darkest text)
-//   charcoalText: "#5C6B73", // Used for Body Text (muted gray)
-//   midGray: "#E5E7EB", // Used for subtle borders
-//   lightGray: "#F7F9FA", // Used for the main background
-// };
-// --- END BRAND_COLORS PLACEHOLDER ---
+
 
 export default function ComingSoon() {
   const ecoGreen = BRAND_COLORS.ecoGreen;

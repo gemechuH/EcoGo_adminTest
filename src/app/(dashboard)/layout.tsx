@@ -11,10 +11,10 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar
+      {/* <Sidebar
         userPermissions={user.permissions || {}}
         userName={user.firstName || user.email}
-      />
+      /> */}
       <main className="flex-1 overflow-y-auto relative">
         <TopActionsBar />
         {children}
