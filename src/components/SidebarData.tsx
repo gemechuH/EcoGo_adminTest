@@ -68,6 +68,7 @@ export const menuItems: MenuItem[] = [
       {
         id: "users/drivers",
         label: "Drivers",
+        
 
         requiredPermission: { resource: "drivers", action: "read" },
         children: [
@@ -315,7 +316,7 @@ export const menuItems: MenuItem[] = [
 
   {
     id: "core-wallet",
-    label: "Core Wallet & Finance Modules",
+    label: "Core Wallet & Finance",
     icon: Wallet2, // choose Wallet, CreditCard, Banknote, etc.
     isDropdown: true,
     requiredPermission: { resource: "finance", action: "read" },

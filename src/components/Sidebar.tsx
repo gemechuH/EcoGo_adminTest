@@ -215,14 +215,14 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
                 <div key={item.id}>
                   {/* PARENT DROPDOWN ROW */}
                   <div
-                    className="w-full flex items-center gap-1 px-2 py-1 rounded-lg mb-1 transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
+                    className="w-full flex items-center gap-2 px-2 py-1 rounded-lg mb-1 transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
                     style={{
                       backgroundColor: rowActive ? "#3A4750" : "transparent",
-                     
+
                       color: rowActive ? "#2DB85B" : "white",
                     }}
                   >
-                    {/* <Icon className="w-4 h-4 shrink-0" /> */}
+                    <Icon className="w-4 h-4 shrink-0 text-[#2DB85B]" />
 
                     <button
                       type="button"
@@ -367,10 +367,10 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
         <div className="p-3">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-start gap-3 px-4 py-3 rounded-lg text-white font-semibold transition-all duration-200 ease-in-out hover:font-extrabold hover:text-base hover:text-[#2DB85B]"
+            className="w-full flex items-center justify-start gap-2 px-4 py-2 rounded-lg text-white font-semibold transition-all duration-200 ease-in-out hover:font-extrabold hover:text-base hover:text-gray-400"
             style={{ backgroundColor: "transparent" }} // Removed static background color
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-4 h-4" />
             Logout
           </button>
         </div>
