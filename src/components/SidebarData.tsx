@@ -72,14 +72,14 @@ export const menuItems: MenuItem[] = [
 
         requiredPermission: { resource: "drivers", action: "read" },
         children: [
-          { id: "users/drivers/all", label: "All Drivers" },
-          { id: "users/drivers/active", label: "Active Drivers" },
-          { id: "users/drivers/inactive", label: "Inactive Drivers" },
-          { id: "users/drivers/new", label: "Add New Driver" },
-          { id: "users/drivers/applications", label: "Driver Applications" },
-          { id: "users/drivers/documents", label: "Document Verification" },
-          { id: "users/drivers/ratings", label: "Driver Ratings" },
-          { id: "users/drivers/violations", label: "Violations & Reports" },
+          { id: "drivers", label: "All Drivers" },
+          { id: "drivers/active", label: "Active Drivers" },
+          { id: "drivers/inactive", label: "Inactive Drivers" },
+          { id: "drivers/new", label: "Add New Driver" },
+          { id: "drivers/applications", label: "Driver Applications" },
+          { id: "drivers/documents", label: "Document Verification" },
+          { id: "drivers/ratings", label: "Driver Ratings" },
+          { id: "drivers/violations", label: "Violations & Reports" },
         ],
       },
 
@@ -92,12 +92,12 @@ export const menuItems: MenuItem[] = [
 
         requiredPermission: { resource: "riders", action: "read" },
         children: [
-          { id: "users/riders/all", label: "All Riders" },
-          { id: "users/riders/active", label: "Active Riders" },
-          { id: "users/riders/inactive", label: "Inactive Riders" },
-          { id: "users/riders/blocked", label: "Blocked Riders" },
-          { id: "users/riders/ratings", label: "Rider Ratings" },
-          { id: "users/riders/referrals", label: "Referral Tracking" },
+          { id: "riders", label: "All Riders" },
+          { id: "riders/active", label: "Active Riders" },
+          { id: "riders/inactive", label: "Inactive Riders" },
+          { id: "riders/blocked", label: "Blocked Riders" },
+          { id: "riders/ratings", label: "Rider Ratings" },
+          { id: "riders/referrals", label: "Referral Tracking" },
         ],
       },
 
@@ -110,11 +110,11 @@ export const menuItems: MenuItem[] = [
 
         requiredPermission: { resource: "admins", action: "read" },
         children: [
-          { id: "users/admins/all", label: "All Admins" },
-          { id: "users/admins/new", label: "Add New Admin" },
-          { id: "users/admins/roles", label: "Role Assignment" },
-          { id: "users/admins/permissions", label: "Permissions Control" },
-          { id: "users/admins/activity", label: "Admin Activity Logs" },
+          { id: "admins", label: "All Admins" },
+          { id: "admins/new", label: "Add New Admin" },
+          { id: "admins/roles", label: "Role Assignment" },
+          { id: "admins/permissions", label: "Permissions Control" },
+          { id: "admins/activity", label: "Admin Activity Logs" },
         ],
       },
 
@@ -127,11 +127,11 @@ export const menuItems: MenuItem[] = [
 
         requiredPermission: { resource: "operators", action: "read" },
         children: [
-          { id: "users/operators/all", label: "All Operators" },
-          { id: "users/operators/active", label: "Active Operators" },
-          { id: "users/operators/new", label: "Add New Operator" },
-          { id: "users/operators/roles", label: "Operator Roles" },
-          { id: "users/operators/logs", label: "Operator Dispatch Logs" },
+          { id: "operators", label: "All Operators" },
+          { id: "operators/active", label: "Active Operators" },
+          { id: "operators/new", label: "Add New Operator" },
+          { id: "operators/roles", label: "Operator Roles" },
+          { id: "operators/logs", label: "Operator Dispatch Logs" },
         ],
       },
       {
@@ -164,7 +164,7 @@ export const menuItems: MenuItem[] = [
       { id: "operations/completed-history", label: "Completed History" },
       { id: "operations/cancelled-rides", label: "Cancelled Rides" },
       { id: "operations/driver-performance", label: "Driver Performance" },
-      { id: "operations/heatmap", label: "Heatmap / Demand Zones" },
+
     ],
   },
   {
@@ -200,7 +200,7 @@ export const menuItems: MenuItem[] = [
       { id: "bookings/manual-assign", label: "Manual Assignment" },
       { id: "bookings/live-tracking", label: "Live Ride Tracking" },
       { id: "bookings/rebooking", label: "Re-booking / Retry" },
-      { id: "bookings/fare-adjustments", label: "Fare Adjustments" },
+     
       { id: "bookings/issues", label: "Ride Issues / Support" },
       { id: "bookings/audit", label: "Booking Audit Logs" },
     ],
@@ -287,32 +287,7 @@ export const menuItems: MenuItem[] = [
       { id: "reports/payout-reports", label: "Payout Reports" },
     ],
   },
-  // {
-  //   id: "settings",
-  //   label: "Settings",
-  //   icon: Settings,
-  //   isDropdown: true,
-  //   requiredPermission: { resource: "settings", action: "read" },
-  //   children: [
-  //     {
-  //       id: "settings/general",
-  //       label: "General",
-  //       children: [
-  //         { id: "settings/general/system", label: "System" },
-  //         { id: "settings/general/profile", label: "Profile" },
-  //       ],
-  //     },
-  //     { id: "settings/config", label: "Configuration" },
-  //     {
-  //       id: "settings/pricing",
-  //       label: "Pricing Rules",
-  //       requiredPermission: { resource: "pricing", action: "read" },
-  //     },
-  //     { id: "settings/notifications", label: "Notification Settings" },
-  //     { id: "settings/api", label: "API Keys" },
-  //     { id: "settings/audit", label: "Audit Logs" },
-  //   ],
-  // },
+  
 
   {
     id: "core-wallet",
@@ -325,21 +300,21 @@ export const menuItems: MenuItem[] = [
       // 1.1 WALLETS DASHBOARD
       {
         id: "core-wallet/dashboard",
-        label: "Wallets Dashboard",
+        label: "Wallets",
 
         children: [
-          { id: "core-wallet/dashboard/ecowallet", label: "EcoWallet" },
-          { id: "core-wallet/dashboard/cadwallet", label: "CAD Wallet" },
-          { id: "core-wallet/dashboard/balance", label: "Wallet Balance" },
+          { id: "core-wallet/ecowallet", label: "EcoWallet" },
+          { id: "core-wallet/cadwallet", label: "CAD Wallet" },
+          { id: "core-wallet/balance", label: "Wallet Balance" },
           {
-            id: "core-wallet/dashboard/transactions",
+            id: "core-wallet/transactions",
             label: "Wallet Transactions",
           },
           {
-            id: "core-wallet/dashboard/conversion-rules",
+            id: "core-wallet/conversion-rules",
             label: "Conversion Rules",
           },
-          { id: "core-wallet/dashboard/conditions", label: "Conditions" },
+          { id: "core-wallet/conditions", label: "Conditions" },
         ],
       },
 
@@ -353,7 +328,7 @@ export const menuItems: MenuItem[] = [
           { id: "core-wallet/fees/edit", label: "Edit Fees" },
           {
             id: "core-wallet/fees/fee-types",
-            label: "Fee Types (Flat, %, Conditional)",
+            label: "Fee Types",
           },
           { id: "core-wallet/fees/effective-dates", label: "Effective Dates" },
           { id: "core-wallet/fees/rules", label: "Fee Rules" },
@@ -379,7 +354,7 @@ export const menuItems: MenuItem[] = [
         label: "Base Pricing",
         children: [
           { id: "pricing/base/base-fare", label: "Base Fare" },
-          { id: "pricing/base/cost-per-km", label: "Cost per KM" },
+          { id: "pricing/base/cost-per-km", label: "Cost per Km" },
           { id: "pricing/base/cost-per-minute", label: "Cost per Minute" },
           { id: "pricing/base/min-max-fare", label: "Min/Max Fare" },
         ],
@@ -445,7 +420,7 @@ export const menuItems: MenuItem[] = [
   },
   {
     id: "incentives",
-    label: "Incentive Management",
+    label: "Incentive",
     icon: Gift, // choose an icon like lucide-react "Gift" or "Medal"
     isDropdown: true,
     requiredPermission: { resource: "incentives", action: "read" },
@@ -549,7 +524,7 @@ export const menuItems: MenuItem[] = [
         children: [
           { id: "user-auth/signup/registration", label: "Registration" },
           { id: "user-auth/signup/edit", label: "Edit" },
-          { id: "user-auth/signup/inactive", label: "Inactive (No Delete)" },
+          { id: "user-auth/signup/inactive", label: "Inactive" },
         ],
       },
 

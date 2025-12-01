@@ -205,7 +205,8 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
               if (rowActive && item.isDropdown && !isExpanded) {
                 setExpandedMenus((prev) => ({ ...prev, [item.id]: true }));
               }
-            }, [rowActive, item.isDropdown, isExpanded, item.id]);
+              // FIX: Removed 'isExpanded' from dependency array to allow manual closing
+            }, [rowActive, item.isDropdown, item.id]);
 
             const handler = () => toggleDropdown(item.id);
             const showDropdown = !!item.isDropdown;
@@ -218,7 +219,6 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
                     className="w-full flex items-center gap-2 px-2 py-1 rounded-lg mb-1 transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
                     style={{
                       backgroundColor: rowActive ? "#3A4750" : "transparent",
-
                       color: rowActive ? "#2DB85B" : "white",
                     }}
                   >
@@ -298,7 +298,7 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
                                               `/${child.id}`
                                             )
                                           }
-                                          className="block px-1 py-1 rounded-lg text-[10px] transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
+                                          className="block px-5 py-1 rounded-lg text-[10px] transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
                                           style={{
                                             backgroundColor: childActive
                                               ? "#3A4750"
