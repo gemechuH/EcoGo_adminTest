@@ -59,32 +59,94 @@ export const menuItems: MenuItem[] = [
     label: "Users",
     icon: Users,
     isDropdown: true,
-    // requiredPermission: { resource: "users", action: "read" }, // Removed to allow access to children (Drivers, Riders) for roles without full user access
+    requiredPermission: { resource: "users", action: "read" },
+
     children: [
+      // ---------------------------------------
+      // DRIVERS
+      // ---------------------------------------
       {
-        id: "drivers",
+        id: "users/drivers",
         label: "Drivers",
+
         requiredPermission: { resource: "drivers", action: "read" },
+        children: [
+          { id: "users/drivers/all", label: "All Drivers" },
+          { id: "users/drivers/active", label: "Active Drivers" },
+          { id: "users/drivers/inactive", label: "Inactive Drivers" },
+          { id: "users/drivers/new", label: "Add New Driver" },
+          { id: "users/drivers/applications", label: "Driver Applications" },
+          { id: "users/drivers/documents", label: "Document Verification" },
+          { id: "users/drivers/ratings", label: "Driver Ratings" },
+          { id: "users/drivers/violations", label: "Violations & Reports" },
+        ],
       },
+
+      // ---------------------------------------
+      // RIDERS
+      // ---------------------------------------
       {
-        id: "riders",
+        id: "users/riders",
         label: "Riders",
+
         requiredPermission: { resource: "riders", action: "read" },
+        children: [
+          { id: "users/riders/all", label: "All Riders" },
+          { id: "users/riders/active", label: "Active Riders" },
+          { id: "users/riders/inactive", label: "Inactive Riders" },
+          { id: "users/riders/blocked", label: "Blocked Riders" },
+          { id: "users/riders/ratings", label: "Rider Ratings" },
+          { id: "users/riders/referrals", label: "Referral Tracking" },
+        ],
       },
+
+      // ---------------------------------------
+      // ADMINS
+      // ---------------------------------------
       {
-        id: "admins",
+        id: "users/admins",
         label: "Admins",
-        requiredPermission: { resource: "users", action: "read" },
+
+        requiredPermission: { resource: "admins", action: "read" },
+        children: [
+          { id: "users/admins/all", label: "All Admins" },
+          { id: "users/admins/new", label: "Add New Admin" },
+          { id: "users/admins/roles", label: "Role Assignment" },
+          { id: "users/admins/permissions", label: "Permissions Control" },
+          { id: "users/admins/activity", label: "Admin Activity Logs" },
+        ],
       },
+
+      // ---------------------------------------
+      // OPERATORS (CALL CENTER / DISPATCHERS)
+      // ---------------------------------------
       {
-        id: "operators",
+        id: "users/operators",
         label: "Operators",
+
         requiredPermission: { resource: "operators", action: "read" },
+        children: [
+          { id: "users/operators/all", label: "All Operators" },
+          { id: "users/operators/active", label: "Active Operators" },
+          { id: "users/operators/new", label: "Add New Operator" },
+          { id: "users/operators/roles", label: "Operator Roles" },
+          { id: "users/operators/logs", label: "Operator Dispatch Logs" },
+        ],
       },
       {
-        id: "driver-applications",
-        label: "Driver Applications",
-        requiredPermission: { resource: "drivers", action: "read" },
+        id: "dispatch",
+        label: "Dispatch",
+       // or Navigation, MapPin, Satellite, etc.
+        
+        requiredPermission: { resource: "dispatch", action: "read" },
+
+        children: [
+          { id: "dispatch/gps", label: "GPS" },
+          { id: "dispatch/maps", label: "Maps" },
+          { id: "dispatch/heat-maps", label: "Heat Maps" },
+          { id: "dispatch/tasks", label: "Tasks" },
+          { id: "dispatch/driver-assignment", label: "Driver Assignment" },
+        ],
       },
     ],
   },
@@ -119,30 +181,29 @@ export const menuItems: MenuItem[] = [
     ],
   },
   {
-  id: "bookings",
-  label: "Bookings",
-  icon: Calendar,
-  isDropdown: true,
-  requiredPermission: { resource: "rides", action: "read" },
+    id: "bookings",
+    label: "Bookings",
+    icon: Calendar,
+    isDropdown: true,
+    requiredPermission: { resource: "rides", action: "read" },
 
-  children: [
-    { id: "bookings/all", label: "All Bookings" },
-    { id: "bookings/active", label: "Active Rides" },
-    { id: "bookings/scheduled", label: "Scheduled Rides" },
-    { id: "bookings/completed", label: "Completed Rides" },
-    { id: "bookings/cancelled", label: "Cancelled Rides" },
-    { id: "bookings/pending", label: "Pending Assignments" },
-    { id: "bookings/unassigned", label: "Unassigned Rides" },
-    { id: "bookings/auto-assign", label: "Auto-Assign Queue" },
-    { id: "bookings/manual-assign", label: "Manual Assignment" },
-    { id: "bookings/live-tracking", label: "Live Ride Tracking" },
-    { id: "bookings/rebooking", label: "Re-booking / Retry" },
-    { id: "bookings/fare-adjustments", label: "Fare Adjustments" },
-    { id: "bookings/issues", label: "Ride Issues / Support" },
-    { id: "bookings/audit", label: "Booking Audit Logs" },
-  ],
-}
-,
+    children: [
+      { id: "bookings/all", label: "All Bookings" },
+      { id: "bookings/active", label: "Active Rides" },
+      { id: "bookings/scheduled", label: "Scheduled Rides" },
+      { id: "bookings/completed", label: "Completed Rides" },
+      { id: "bookings/cancelled", label: "Cancelled Rides" },
+      { id: "bookings/pending", label: "Pending Assignments" },
+      { id: "bookings/unassigned", label: "Unassigned Rides" },
+      { id: "bookings/auto-assign", label: "Auto-Assign Queue" },
+      { id: "bookings/manual-assign", label: "Manual Assignment" },
+      { id: "bookings/live-tracking", label: "Live Ride Tracking" },
+      { id: "bookings/rebooking", label: "Re-booking / Retry" },
+      { id: "bookings/fare-adjustments", label: "Fare Adjustments" },
+      { id: "bookings/issues", label: "Ride Issues / Support" },
+      { id: "bookings/audit", label: "Booking Audit Logs" },
+    ],
+  },
   {
     id: "finance",
     label: "Finance & Payments",
@@ -518,24 +579,10 @@ export const menuItems: MenuItem[] = [
       },
     ],
   },
-  {
-    id: "dispatch",
-    label: "Operator / Dispatch Modules",
-    icon: Map, // or Navigation, MapPin, Satellite, etc.
-    isDropdown: true,
-    requiredPermission: { resource: "dispatch", action: "read" },
 
-    children: [
-      { id: "dispatch/gps", label: "GPS" },
-      { id: "dispatch/maps", label: "Maps" },
-      { id: "dispatch/heat-maps", label: "Heat Maps" },
-      { id: "dispatch/tasks", label: "Tasks" },
-      { id: "dispatch/driver-assignment", label: "Driver Assignment" },
-    ],
-  },
   {
     id: "system",
-    label: "System Modules",
+    label: "Systems",
     icon: Cog, // or ServerCog, Settings2, Activity, etc.
     isDropdown: true,
     requiredPermission: { resource: "system", action: "read" },

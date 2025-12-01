@@ -143,7 +143,7 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
 
       <aside
         ref={sidebarRef}
-        className={`fixed md:static top-0 left-0 h-full z-40 w-64 flex flex-col transition-transform duration-300
+        className={`fixed md:static top-0 left-0 h-full z-40 w-60 flex flex-col transition-transform duration-300
         bg-(--charcoal-dark) ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
@@ -215,10 +215,10 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
                 <div key={item.id}>
                   {/* PARENT DROPDOWN ROW */}
                   <div
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
+                    className="w-full flex items-center gap-1 px-2 py-1 rounded-lg mb-1 transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
                     style={{
                       backgroundColor: rowActive ? "#3A4750" : "transparent",
-                      // Color is now always white unless active (icon/chevron/text)
+                     
                       color: rowActive ? "#2DB85B" : "white",
                     }}
                   >
@@ -228,7 +228,7 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
                       type="button"
                       onClick={handler}
                       aria-expanded={isExpanded}
-                      className="flex-1 text-sm font-semibold leading-[22px] text-left"
+                      className="flex-1 text-[12px] font-medium leading-[22px] text-left"
                       style={{
                         color: rowActive || isExpanded ? "#2DB85B" : "inherit",
                       }} // Keep text color for active/expanded
@@ -247,7 +247,7 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
 
                   {/* SUB ITEMS */}
                   {isExpanded && (
-                    <div className="ml-4 mb-2 space-y-1">
+                    <div className="ml-6">
                       {subItems.map((sub: any) => {
                         const subActive = currentPage === sub.id;
 
@@ -261,7 +261,7 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
                             <div key={sub.id}>
                               <button
                                 onClick={() => toggleDropdown(sub.id)}
-                                className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-sm transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
+                                className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-[12px] transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
                                 style={{
                                   backgroundColor:
                                     isParentExpanded || parentActive
@@ -298,7 +298,7 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
                                               `/${child.id}`
                                             )
                                           }
-                                          className="block px-4 py-2 rounded-lg text-sm transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
+                                          className="block px-1 py-1 rounded-lg text-[10px] transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
                                           style={{
                                             backgroundColor: childActive
                                               ? "#3A4750"
@@ -327,7 +327,7 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
                             onClick={(e) =>
                               handleLinkClick(e as any, `/${sub.id}`)
                             }
-                            className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-sm transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
+                            className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-[12px] transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
                             style={{
                               backgroundColor: subActive
                                 ? "#3A4750"
@@ -351,7 +351,7 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
                 key={item.id}
                 href={`/${item.id}`}
                 onClick={(e) => handleLinkClick(e as any, `/${item.id}`)}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 cursor-pointer transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
+                className="w-full flex items-center gap-1 px-1 py-1 rounded-lg  cursor-pointer transition duration-150 ease-in-out hover:bg-[#3A4750] hover:text-[#2DB85B]"
                 style={{
                   backgroundColor: isActive ? "#3A4750" : "transparent",
                   color: isActive ? "#2DB85B" : "white", // Green for active link
