@@ -206,11 +206,11 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   className="font-medium hover:underline transition-colors"
                   style={{ color: "var(--eco-green)" }}
                 >
-                  support@ecogoclub.com
+                  support@ecogoclub.comfghhjktytyyttyyy
                 </Link>
               </p>
               <p className="text-xs text-gray-400">
-                &copy; 2025 EcoGo Management. All rights reserved.
+                &copy; 2025 EcoGo Managementddsfewrty. All rights reserved.
               </p>
             </div>
           </CardContent>
