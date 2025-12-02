@@ -259,8 +259,8 @@ export const menuItems: MenuItem[] = [
       {
         id: "financial-tax-information",
         label: "Financial & Tax Information",
-         // or Wallet, Banknote — choose your preferred icon
-        
+        // or Wallet, Banknote — choose your preferred icon
+
         requiredPermission: { resource: "finance", action: "read" },
 
         children: [
@@ -327,6 +327,75 @@ export const menuItems: MenuItem[] = [
     isDropdown: true,
     requiredPermission: { resource: "it", action: "read" },
     children: [
+      {
+        id: "technology-integration",
+        label: "Technology & Integration Info",
+        // or Server, Workflow, Activity — pick your preferred icon
+
+        requiredPermission: { resource: "system", action: "read" },
+
+        children: [
+          {
+            id: "tech/gps-telematics",
+            label: "GPS & Telematics Requirements",
+          },
+          {
+            id: "tech/payment-compliance",
+            label: "Payment Gateway Compliance (PCI)",
+          },
+          {
+            id: "tech/ride-history-logs",
+            label: "Ride History Logs",
+          },
+          {
+            id: "tech/driver-telematics",
+            label: "Driver Telematics (Speeding, Braking, Idle)",
+          },
+          {
+            id: "tech/app-version-tracking",
+            label: "App Version Tracking (Driver & Rider)",
+          },
+          {
+            id: "tech/support-tickets",
+            label: "Customer Support Ticketing Workflow",
+          },
+          {
+            id: "tech/operational-kpis",
+            label: "Operational Dashboard KPI Metrics",
+          },
+        ],
+      },
+      {
+  id: "role-management",
+  label: "Role Management",
+  icon: ShieldCheck, // or UsersCog, LockKeyhole — pick your preferred icon
+  isDropdown: true,
+  requiredPermission: { resource: "roles", action: "read" },
+
+  children: [
+    { 
+      id: "roles/add", 
+      label: "Add Role",
+      requiredPermission: { resource: "roles", action: "create" }
+    },
+    { 
+      id: "roles/edit", 
+      label: "Edit Role",
+      requiredPermission: { resource: "roles", action: "update" }
+    },
+    { 
+      id: "roles/inactive", 
+      label: "Inactive Roles",
+      requiredPermission: { resource: "roles", action: "update" }
+    },
+    { 
+      id: "roles/permissions", 
+      label: "Permissions per Role",
+      requiredPermission: { resource: "roles", action: "read" }
+    },
+  ]
+},
+
       { id: "it/devices", label: "Device Management" },
       { id: "it/system-health", label: "System Health" },
       { id: "it/integrations", label: "Integrations" },
@@ -703,7 +772,7 @@ export const menuItems: MenuItem[] = [
         ],
       },
 
-      // 5.3 ROLE MANAGEMENT
+      // 5.3 MANAGEMENT
       {
         id: "user-auth/vehicle",
         label: "Vehicle and Insurance info",

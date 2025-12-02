@@ -202,7 +202,7 @@ export function Sidebar({ userPermissions, userName }: SidebarProps) {
         }`}
       >
         {/* Logo */}
-        <div className="p-6">
+        <div className="px-6 py-3">
           <Image
             src={logo}
             alt="EcoGo Logo"
