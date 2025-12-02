@@ -51,7 +51,7 @@ export default function TopActionsBar() {
                   setLanguage("English");
                   setOpenLang(false);
                 }}
-                className="block w-full text-left px-2 py-2 text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="block w-full text-center px-2 py-2 text-white  dark:hover:bg-gray-700"
               >
                 English
               </button>
@@ -60,7 +60,7 @@ export default function TopActionsBar() {
                   setLanguage("French");
                   setOpenLang(false);
                 }}
-                className="block w-full text-left px-2 py-2 text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="block w-full text-center px-2 py-2 text-[#2db85b] hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 French
               </button>

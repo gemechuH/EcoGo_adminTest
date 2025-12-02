@@ -239,6 +239,7 @@ export function DashboardPage({ metrics }: { metrics?: DashboardMetrics }) {
                     stroke="var(--eco-green)"
                     strokeWidth={2}
                     name="Bookings"
+                    activeDot={{ r: 8, fill: "var(--eco-green)" }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -253,7 +254,7 @@ export function DashboardPage({ metrics }: { metrics?: DashboardMetrics }) {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={metrics?.revenueTrend || []}>
+                <LineChart data={metrics?.revenueTrend || []}>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     stroke="var(--gray-mid)"
@@ -262,14 +263,15 @@ export function DashboardPage({ metrics }: { metrics?: DashboardMetrics }) {
                   <YAxis stroke="var(--charcoal-dark)" />
                   <Tooltip />
                   <Legend />
-                  <Bar
+                  <Line
+                    type="monotone"
                     dataKey="revenue"
-                    fill="#343B41"
-                    name="Revenue ($)"
-                    barSize={55}
-                    activeBar={{ fill: "var(--eco-green)" }}
+                    stroke="var(--eco-green)"
+                    name="Revenue"
+                    strokeWidth={2}
+                    activeDot={{ r: 6, fill: "var(--eco-green)" }}
                   />
-                </BarChart>
+                </LineChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
