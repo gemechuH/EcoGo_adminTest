@@ -96,7 +96,7 @@ export const menuItems: MenuItem[] = [
           // { id: "riders/inactive", label: "Inactive Riders" },
           // { id: "riders/blocked", label: "Blocked Riders" },
           { id: "riders/ratings", label: "Rider Ratings" },
-          { id: "riders/referrals", label: "Referral Tracking" },
+          // { id: "riders/referrals", label: "Referral Tracking" },
         ],
       },
 
@@ -816,7 +816,7 @@ export const menuItems: MenuItem[] = [
         label: "Reports",
 
         children: [
-          { id: "reports/ride-reports", label: "Ride Reports" },
+          { id: "reports/rider-reports", label: "Rider Reports" },
           { id: "reports/driver-reports", label: "Driver Reports" },
           { id: "reports/revenue-reports", label: "Revenue Reports" },
           { id: "reports/payout-reports", label: "Payout Reports" },

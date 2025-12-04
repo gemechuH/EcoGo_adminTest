@@ -610,7 +610,7 @@ export function DriversPage() {
 
       <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 w-full overflow-hidden">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-800">Drivers list</h2>
+          <h2 className="text-lg font-semibold text-white bg-[#2f3a3f] rounded-md p-1">Drivers list</h2>
           <button
             onClick={handleAddDriver}
             className="flex items-center rounded-lg bg-[#2DB85B] px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-green-700 transition-colors"

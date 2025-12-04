@@ -302,7 +302,10 @@ export function DashboardPage({ metrics }: { metrics?: DashboardMetrics }) {
                         <div
                           className={`h-full rounded-full transition-all`}
                           style={{
-                            backgroundColor: "var(--charcoal-dark)",
+                            backgroundColor:
+                              index === 0
+                                ? "var(--eco-green)"
+                                : "var(--charcoal-dark)",
                             width: `${percentage}%`,
                           }}
                         />
