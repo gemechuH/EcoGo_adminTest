@@ -40,7 +40,7 @@ import {
 
 // --- CONFIGURATION & MOCK UI COMPONENTS ---
 
-const GREEN_BRAND_COLOR = "bg-emerald-600 hover:bg-emerald-700";
+const GREEN_BRAND_COLOR = "bg-[#2DB85B] hover:bg-green-700";
 const PAGE_SIZE = 10;
 const TOTAL_MOCK_RIDES = 35;
 const RIDER_MOCK_ID = "rider@example.com";
@@ -575,10 +575,11 @@ const CreateRideModal: React.FC<{
               <h3 className="text-xl font-bold text-white">
                 Create New Ride Request
               </h3>
-              <p className="text-emerald-100 text-sm">
-                Fill in the details to create a ride request
-              </p>
             </div>
+            <p className="text-emerald-100 text-sm">
+              Fill in the details to create a ride request
+            </p>
+
             <button
               onClick={handleClose}
               className="p-2 rounded-lg hover:bg-white/10 transition-colors"
@@ -2146,16 +2147,17 @@ const RideRequestAdminPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       {/* Page Header */}
       <div className="mb-6">
-        <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-5 py-4 rounded-xl shadow-sm">
+        <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-2 py-2 font-normal rounded-xl shadow-sm">
           <h1 className="text-2xl font-bold">Ride Requests</h1>
-          <p className="text-gray-300 text-sm mt-1">
-            Manage and monitor all ride requests
-          </p>
         </div>
+        <p className="text-black pl-3 text-sm mt-1">
+          Manage and monitor all ride requests
+        </p>
+
         <nav className="flex items-center gap-2 mt-2 text-sm">
           <Link
             href="/ride"
-            className="text-emerald-600 hover:text-emerald-700 hover:underline font-medium flex items-center gap-1"
+            className="text-blacl hover:text-emerald-700 hover:underline font-medium flex items-center gap-1"
           >
             <Home className="w-3.5 h-3.5" /> Home
           </Link>
@@ -2273,31 +2275,31 @@ const RideRequestAdminPage: React.FC = () => {
           <table className="min-w-full">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase w-12">
-                  Sr. no
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700  w-12">
+                  Ride ID
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase min-w-[180px]">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700  min-w-[180px]">
                   Customer details
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase min-w-[200px]">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700  min-w-[200px]">
                   Pickup address
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase min-w-[200px]">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700  min-w-[200px]">
                   Drop address
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase w-32">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700  w-32">
                   Request Time
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase w-32">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700  w-32">
                   Pickup Time
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase w-24">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700  w-24">
                   Type
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase w-32">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700  w-32">
                   Status
                 </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase w-20">
+                <th className="px-4 py-3 text-center text-xs font-bold text-gray-700 w-20">
                   Action
                 </th>
               </tr>
@@ -2310,27 +2312,27 @@ const RideRequestAdminPage: React.FC = () => {
                     index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
                   }`}
                 >
-                  <td className="px-4 py-4 text-sm font-medium text-blue-600">
+                  <td className="px-4 py-4 text-xs font-medium text-blue-600">
                     {ride.srNo}
                   </td>
                   <td className="px-4 py-4">
                     <div className="space-y-0.5">
-                      <p className="text-sm text-gray-900">
+                      <p className="text-xs text-gray-900">
                         <span className="font-medium text-gray-500">N:</span>{" "}
                         {ride.customer.name}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-600">
                         <span className="font-medium text-gray-500">P:</span>{" "}
                         {ride.customer.phone}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-600">
                         <span className="font-medium text-gray-500">E:</span>{" "}
                         {ride.customer.email}
                       </p>
                     </div>
                   </td>
                   <td className="px-4 py-4">
-                    <p className="text-sm text-gray-900">
+                    <p className="text-xs text-gray-900">
                       {ride.pickupAddress}
                     </p>
                     <p className="text-xs text-gray-500">
@@ -2338,12 +2340,12 @@ const RideRequestAdminPage: React.FC = () => {
                     </p>
                   </td>
                   <td className="px-4 py-4">
-                    <p className="text-sm text-gray-900">{ride.dropAddress}</p>
+                    <p className="text-xs text-gray-900">{ride.dropAddress}</p>
                     <p className="text-xs text-gray-500">{ride.dropCity}</p>
                   </td>
                   {/* Request Time */}
                   <td className="px-4 py-4">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-xs font-medium text-gray-900">
                       {formatDate(ride.requestDate)}
                     </p>
                     <p className="text-xs text-gray-500">
@@ -2354,7 +2356,7 @@ const RideRequestAdminPage: React.FC = () => {
                   <td className="px-4 py-4">
                     {ride.pickupTime ? (
                       <div>
-                        <p className="text-sm font-medium text-emerald-600">
+                        <p className="text-xs font-medium text-emerald-600">
                           {formatDate(ride.pickupTime)}
                         </p>
                         <p className="text-xs text-gray-500">
@@ -2378,7 +2380,7 @@ const RideRequestAdminPage: React.FC = () => {
                       </div>
                     ) : (
                       <div>
-                        <span className="text-sm text-gray-400">—</span>
+                        <span className="text-xs text-gray-400">—</span>
                         <p className="text-xs text-gray-400 mt-1">
                           {ride.status === "PENDING" && "Awaiting driver"}
                           {(ride.status === "CANCELLED" ||
@@ -2390,7 +2392,7 @@ const RideRequestAdminPage: React.FC = () => {
                   </td>
                   {/* Type */}
                   <td className="px-4 py-4">
-                    <span className="text-sm text-gray-900">
+                    <span className="text-xs text-gray-900">
                       {RIDE_TYPE_LABELS[ride.rideType].split(" ")[0]}
                     </span>
                   </td>
@@ -2467,7 +2469,7 @@ const RideRequestAdminPage: React.FC = () => {
                 onClick={() => handlePageChange(1)}
                 disabled={currentPage === 1}
               >
-                <ChevronsLeft className="h-4 w-4" />
+                <ChevronsLeft className="h-4 w-4 text-black" />
               </Button>
               <Button
                 variant="outline"
@@ -2482,7 +2484,7 @@ const RideRequestAdminPage: React.FC = () => {
               </span>
               <Button
                 variant="outline"
-                className="p-2 h-8 w-8"
+                className="p-2 h-8 w-8 text-black"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >

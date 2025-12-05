@@ -204,6 +204,8 @@ export const menuItems: MenuItem[] = [
       // { id: "ride/pending", label: "Pending Rides" },
       // { id: "ride/scheduled", label: "Scheduled Rides" },
       { id: "ride/completed", label: "Completed Rides" },
+      { id: "ride/complaints", label: "Ride Complaints " },
+      // { id: "support/ride-complaints", label: "Ride Complaints" },
       // { id: "ride/cancelled", label: "Cancelled Rides" },
       // { id: "operations/driver-performance", label: "Driver Performance" },
     ],
@@ -325,7 +327,7 @@ export const menuItems: MenuItem[] = [
       { id: "hr/performance", label: "Performance" },
     ],
   },
-  
+
   {
     id: "it_support",
     label: "IT & Systems",
