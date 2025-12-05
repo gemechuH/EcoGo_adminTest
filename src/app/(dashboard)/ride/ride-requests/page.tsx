@@ -1,5 +1,6 @@
-'use client';
+"use client";
 import React, { useState, useMemo, useCallback } from "react";
+import Link from "next/link";
 import {
   Search,
   Plus,
@@ -14,6 +15,8 @@ import {
   ChevronLeft,
   ChevronsLeft,
   X,
+  Filter,
+  RotateCcw,
 } from "lucide-react";
 
 // --- CONFIGURATION & MOCK UI COMPONENTS ---
@@ -183,6 +186,69 @@ const CardContent: React.FC<{
 
 type RideStatus = "SCHEDULED" | "CANCELLED" | "COMPLETED" | "ON_RIDE";
 
+type RideType =
+  | "IMMEDIATE" // Immediate Ride (On-Demand)
+  | "SCHEDULED" // Scheduled Ride (Future Pickup)
+  | "SHARED" // Shared Ride / Carpool
+  | "PRIORITY" // Priority Ride
+  | "MULTI_STOP" // Multi-Stop Ride
+  | "PACKAGE" // Package/Delivery Request
+  | "ACCESSIBLE"; // Accessible Ride
+
+const RIDE_TYPE_LABELS: Record<RideType, string> = {
+  IMMEDIATE: "Immediate (On-Demand)",
+  SCHEDULED: "Scheduled (Future)",
+  SHARED: "Shared / Carpool",
+  PRIORITY: "Priority Ride",
+  MULTI_STOP: "Multi-Stop",
+  PACKAGE: "Package/Delivery",
+  ACCESSIBLE: "Accessible Ride",
+};
+
+// Payment Status Types
+type PaymentStatus =
+  | "PENDING" // Payment Pending - Waiting for card authorization or wallet top-up
+  | "PAID" // Paid / Payment Successful - Transaction completed
+  | "FAILED" // Payment Failed - Card declined; rider must update method
+  | "REFUNDED"; // Refund / Adjustment Issued - Admin or system corrected fare
+
+const PAYMENT_STATUS_CONFIG: Record<
+  PaymentStatus,
+  { label: string; bgColor: string; textColor: string; borderColor: string }
+> = {
+  PENDING: {
+    label: "Payment Pending",
+    bgColor: "bg-amber-50",
+    textColor: "text-amber-700",
+    borderColor: "border-amber-200",
+  },
+  PAID: {
+    label: "Paid",
+    bgColor: "bg-emerald-50",
+    textColor: "text-emerald-700",
+    borderColor: "border-emerald-200",
+  },
+  FAILED: {
+    label: "Payment Failed",
+    bgColor: "bg-red-50",
+    textColor: "text-red-700",
+    borderColor: "border-red-200",
+  },
+  REFUNDED: {
+    label: "Refunded",
+    bgColor: "bg-purple-50",
+    textColor: "text-purple-700",
+    borderColor: "border-purple-200",
+  },
+};
+
+const PAYMENT_STATUSES: PaymentStatus[] = [
+  "PENDING",
+  "PAID",
+  "FAILED",
+  "REFUNDED",
+];
+
 type Ride = {
   srNo: number;
   id: string;
@@ -196,6 +262,9 @@ type Ride = {
   isScheduled: boolean;
   notes: string;
   driverId?: string;
+  rideType: RideType;
+  paymentStatus: PaymentStatus;
+  fare: string;
 };
 
 type DriverResponse = {
@@ -205,6 +274,16 @@ type DriverResponse = {
   time: string;
   reason?: string;
 };
+
+const RIDE_TYPES: RideType[] = [
+  "IMMEDIATE",
+  "SCHEDULED",
+  "SHARED",
+  "PRIORITY",
+  "MULTI_STOP",
+  "PACKAGE",
+  "ACCESSIBLE",
+];
 
 const mockRides: Ride[] = Array.from({ length: TOTAL_MOCK_RIDES }, (_, i) => ({
   srNo: i + 1,
@@ -226,6 +305,9 @@ const mockRides: Ride[] = Array.from({ length: TOTAL_MOCK_RIDES }, (_, i) => ({
   isScheduled: i % 2 === 0,
   notes: `Manual ride creation test for Sr. No ${i + 1}.`,
   driverId: i < 15 ? `DRV-${i + 1}` : undefined,
+  rideType: RIDE_TYPES[i % RIDE_TYPES.length],
+  paymentStatus: PAYMENT_STATUSES[i % PAYMENT_STATUSES.length],
+  fare: `$${(10 + (i % 20) * 2.5).toFixed(2)}`,
 }));
 
 const mockDriverResponses: { [key: string]: DriverResponse[] } =
@@ -397,6 +479,21 @@ const CreateRideModal: React.FC<{
                 <option value="Auto">Auto</option>
               </Select>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Ride Type
+              </label>
+              <Select name="rideType" onChange={handleFormChange} required>
+                <option value="">Select Ride Type</option>
+                <option value="IMMEDIATE">Immediate (On-Demand)</option>
+                <option value="SCHEDULED">Scheduled (Future)</option>
+                <option value="SHARED">Shared / Carpool</option>
+                <option value="PRIORITY">Priority Ride</option>
+                <option value="MULTI_STOP">Multi-Stop</option>
+                <option value="PACKAGE">Package/Delivery</option>
+                <option value="ACCESSIBLE">Accessible Ride</option>
+              </Select>
+            </div>
             <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700">
                 Admin Notes (Internal)
@@ -491,7 +588,6 @@ const ViewDetailModal: React.FC<{
       onClose={onClose}
       title={`Ride Details: ${ride.id}`}
       
-      
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
         {/* Column 1: Core Info */}
@@ -504,6 +600,14 @@ const ViewDetailModal: React.FC<{
           <DetailItem label="Rider ID" value={ride.riderId} />
           <DetailItem label="Pickup Time" value={ride.pickupTime} />
           <DetailItem label="Vehicle Type" value={ride.vehicleType} />
+          <DetailItem
+            label="Ride Type"
+            value={
+              <span className="inline-flex items-center px-2 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-medium">
+                {RIDE_TYPE_LABELS[ride.rideType]}
+              </span>
+            }
+          />
           <DetailItem
             label="Driver Assigned"
             value={ride.driverId || "Pending"}
@@ -518,12 +622,12 @@ const ViewDetailModal: React.FC<{
           <DetailItem
             label="Pickup Location"
             value={ride.pickupAddress}
-            icon={<Home className="w-4 h-4 text-emerald-500" />}
+            icon={<Home className="w-4 h-4 text-black" />}
           />
           <DetailItem
             label="Drop Location"
             value={ride.dropAddress}
-            icon={<Home className="w-4 h-4 text-emerald-500" />}
+            icon={<Home className="w-4 h-4 text-black" />}
           />
           <DetailItem
             label="Is Scheduled"
@@ -535,14 +639,18 @@ const ViewDetailModal: React.FC<{
           />
         </div>
 
-        {/* Column 3: Admin & Extra Details */}
+        {/* Column 3: Payment & Extra Details */}
         <div className="lg:col-span-1 space-y-6">
           <h4 className="text-lg font-bold border-b pb-2 text-emerald-700">
-            Admin Notes & Logs
+            Payment & Billing
           </h4>
-          <DetailItem label="Admin Notes" value={ride.notes} isLongText />
-          <DetailItem label="Estimated Fare" value="$15.50 (Mock Data)" />
+          <DetailItem
+            label="Payment Status"
+            value={<PaymentStatusBadge status={ride.paymentStatus} />}
+          />
+          <DetailItem label="Fare Amount" value={ride.fare} />
           <DetailItem label="Distance (Km)" value="12.4 Km (Mock Data)" />
+          <DetailItem label="Admin Notes" value={ride.notes} isLongText />
         </div>
       </div>
     </Dialog>
@@ -597,11 +705,41 @@ const RideStatusBadge: React.FC<{ status: RideStatus }> = ({ status }) => {
   return <Badge color={color}>{text}</Badge>;
 };
 
+// Payment Status Badge Component
+const PaymentStatusBadge: React.FC<{ status: PaymentStatus }> = ({
+  status,
+}) => {
+  const config = PAYMENT_STATUS_CONFIG[status];
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${config.bgColor} ${config.textColor} ${config.borderColor}`}
+    >
+      <span
+        className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+          status === "PAID"
+            ? "bg-emerald-500"
+            : status === "PENDING"
+            ? "bg-amber-500"
+            : status === "FAILED"
+            ? "bg-red-500"
+            : "bg-purple-500"
+        }`}
+      />
+      {config.label}
+    </span>
+  );
+};
+
 // --- MAIN PAGE COMPONENT ---
 
 const RideRequestAdminPage: React.FC = () => {
   const [rides, setRides] = useState<Ride[]>(mockRides);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [dateFilter, setDateFilter] = useState<string>("");
+  const [typeFilter, setTypeFilter] = useState<string>("");
+  const [rideTypeFilter, setRideTypeFilter] = useState<string>("");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDriverResponseModalOpen, setIsDriverResponseModalOpen] =
     useState(false);
@@ -614,14 +752,66 @@ const RideRequestAdminPage: React.FC = () => {
   // --- Filtering & Pagination Logic ---
   const filteredRides = useMemo(() => {
     const lowerCaseTerm = searchTerm.toLowerCase();
-    return rides.filter(
-      (r) =>
+    return rides.filter((r) => {
+      // Keyword search
+      const matchesKeyword =
+        !searchTerm ||
         r.riderName.toLowerCase().includes(lowerCaseTerm) ||
         r.id.toLowerCase().includes(lowerCaseTerm) ||
+        r.riderId.toLowerCase().includes(lowerCaseTerm) ||
         r.pickupAddress.toLowerCase().includes(lowerCaseTerm) ||
-        r.dropAddress.toLowerCase().includes(lowerCaseTerm)
-    );
-  }, [rides, searchTerm]);
+        r.dropAddress.toLowerCase().includes(lowerCaseTerm);
+
+      // Status filter
+      const matchesStatus = !statusFilter || r.status === statusFilter;
+
+      // Date filter (matches the date part of pickupTime)
+      const matchesDate =
+        !dateFilter ||
+        r.pickupTime.includes(dateFilter.split("-").slice(1).join("/"));
+
+      // Type filter (Scheduled/Regular)
+      const matchesType =
+        !typeFilter ||
+        (typeFilter === "Scheduled" && r.isScheduled) ||
+        (typeFilter === "Regular" && !r.isScheduled);
+
+      // Ride Type filter
+      const matchesRideType = !rideTypeFilter || r.rideType === rideTypeFilter;
+
+      // Payment Status filter
+      const matchesPaymentStatus =
+        !paymentStatusFilter || r.paymentStatus === paymentStatusFilter;
+
+      return (
+        matchesKeyword &&
+        matchesStatus &&
+        matchesDate &&
+        matchesType &&
+        matchesRideType &&
+        matchesPaymentStatus
+      );
+    });
+  }, [
+    rides,
+    searchTerm,
+    statusFilter,
+    dateFilter,
+    typeFilter,
+    rideTypeFilter,
+    paymentStatusFilter,
+  ]);
+
+  // Clear all filters
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("");
+    setDateFilter("");
+    setTypeFilter("");
+    setRideTypeFilter("");
+    setPaymentStatusFilter("");
+    setCurrentPage(1);
+  };
 
   const totalPages = Math.ceil(filteredRides.length / PAGE_SIZE);
   const currentRides = useMemo(() => {
@@ -655,6 +845,9 @@ const RideRequestAdminPage: React.FC = () => {
       status: "SCHEDULED",
       isScheduled: true,
       notes: data.notes || "",
+      rideType: (data.rideType as RideType) || "IMMEDIATE",
+      paymentStatus: "PENDING",
+      fare: "$0.00",
     };
     setRides((prev) => [newRide, ...prev]);
     setIsCreateModalOpen(false);
@@ -701,88 +894,137 @@ const RideRequestAdminPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 sm:p-10">
-      {/* Breadcrumbs */}
-      <div className="text-2xl text-white bg-black w-full p-1 rounded">
-        <h1 className=" text-white">
-          Ride requests
-        </h1>
-      </div>
-      <div className=" text-sm mb-6 mt-1 text-gray-500">
-        {/* <Home className="w-4 h-4 text-emerald-600" /> */}
-
-        <span>Home</span>
-        <span className="text-black">/ride requests</span>
-
-        {/* Create Ride Request Button */}
-        {/* <Button
-          onClick={() => {
-            setSelectedRide(null); // Clear selected ride for creation
-            setIsEditMode(false);
-            setIsCreateModalOpen(true);
-          }}
-          className={GREEN_BRAND_COLOR}
-        >
-          <Plus className="w-4 h-4 mr-2" /> Create Ride Request
-        </Button> */}
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      {/* Page Header */}
+      <div className="mb-6">
+        <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-3 rounded-lg shadow-sm">
+          <h1 className="text-xl font-semibold">Ride Requests</h1>
+        </div>
+        <nav className="flex items-center gap-2 mt-2 text-sm">
+          <Link
+            href="/ride"
+            className="text-black hover:text-emerald-700 hover:underline font-medium flex items-center gap-1"
+          >
+            <Home className="w-3.5 h-3.5" />
+            Home
+          </Link>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-600">Ride Requests</span>
+        </nav>
       </div>
 
-      {/* <h1 className="text-2xl font-bold text-gray-900 mb-8">Ride Requests</h1> */}
+      {/* Search & Filters Card */}
+      <Card className="mb-6">
+        <div className="p-4 border-b border-gray-100">
+          <div className="flex items-center gap-2 text-gray-700">
+            <Filter className="w-4 h-4" />
+            <span className="font-medium text-sm">Search & Filters</span>
+          </div>
+        </div>
+        <CardContent className="p-4">
+          {/* Search Bar */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search by rider name, email, request ID, or address..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full h-11 pl-10 pr-4 text-sm bg-white border-2 border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-colors placeholder:text-gray-400"
+            />
+          </div>
 
-      {/* Search and Filter Card (Replicated from Design) */}
-      <Card className="mb-8">
-        <CardContent>
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="md:col-span-1">
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  Keyword
-                </label>
-                <Input
-                  placeholder="Enter the rider's name, email or phone number"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              <div className="md:col-span-1">
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  Status
-                </label>
-                <Select>
-                  <option>Select Status</option>
-                  <option>SCHEDULED</option>
-                  <option>COMPLETED</option>
-                  <option>CANCELLED</option>
-                </Select>
-              </div>
-              <div className="md:col-span-1">
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  Date Range
-                </label>
-                <Input type="date" />
-              </div>
-              <div className="md:col-span-1">
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  Type
-                </label>
-                <Select>
-                  <option>Select Type</option>
-                  <option>Regular</option>
-                  <option>Scheduled</option>
-                </Select>
-              </div>
+          {/* Filter Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                Ride Status
+              </label>
+              <Select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="h-9 text-sm"
+              >
+                <option value="">All</option>
+                <option value="SCHEDULED">Scheduled</option>
+                <option value="ON_RIDE">On Ride</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+              </Select>
             </div>
 
-            <div className="flex space-x-4 pt-2">
-              <Button
-                onClick={() => setCurrentPage(1)}
-                className={GREEN_BRAND_COLOR}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                Payment
+              </label>
+              <Select
+                value={paymentStatusFilter}
+                onChange={(e) => setPaymentStatusFilter(e.target.value)}
+                className="h-9 text-sm"
               >
-                <Search className="w-4 h-4 mr-2" /> Search
-              </Button>
-              <Button variant="outline" onClick={() => setSearchTerm("")}>
-                Clear search
+                <option value="">All</option>
+                <option value="PENDING">Pending</option>
+                <option value="PAID">Paid</option>
+                <option value="FAILED">Failed</option>
+                <option value="REFUNDED">Refunded</option>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                Date
+              </label>
+              <Input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="h-9 text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                Booking
+              </label>
+              <Select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="h-9 text-sm"
+              >
+                <option value="">All</option>
+                <option value="Regular">Regular</option>
+                <option value="Scheduled">Scheduled</option>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                Ride Type
+              </label>
+              <Select
+                value={rideTypeFilter}
+                onChange={(e) => setRideTypeFilter(e.target.value)}
+                className="h-9 text-sm"
+              >
+                <option value="">All</option>
+                <option value="IMMEDIATE">Immediate</option>
+                <option value="SCHEDULED">Scheduled</option>
+                <option value="SHARED">Shared</option>
+                <option value="PRIORITY">Priority</option>
+                <option value="MULTI_STOP">Multi-Stop</option>
+                <option value="PACKAGE">Package</option>
+                <option value="ACCESSIBLE">Accessible</option>
+              </Select>
+            </div>
+
+            <div className="flex items-end">
+              <Button
+                variant="outline"
+                onClick={handleClearFilters}
+                className="h-9 w-full flex items-center justify-center text-sm gap-1 p-1"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                Reset
               </Button>
             </div>
           </div>
@@ -800,66 +1042,121 @@ const RideRequestAdminPage: React.FC = () => {
         {/* Table Content */}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-100">
               <tr>
-                {[
-                  "Sr. no",
-                  "Rider Details",
-                  "Pickup Address",
-                  "Drop Address",
-                  "Pickup Time",
-                  "Type",
-                  "Status",
-                  "Action",
-                ].map((header) => (
-                  <th
-                    key={header}
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]"
-                  >
-                    {header}
-                  </th>
-                ))}
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-16">
+                  #
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[180px]">
+                  Rider
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[200px]">
+                  Route
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-28">
+                  Time
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-32">
+                  Ride Type
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-28">
+                  Ride Status
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-36">
+                  Payment
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-20">
+                  Fare
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-20">
+                  Action
+                </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {currentRides.map((ride) => (
-                <tr key={ride.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <tbody className="bg-white divide-y divide-gray-100">
+              {currentRides.map((ride, index) => (
+                <tr
+                  key={ride.id}
+                  className={`hover:bg-emerald-50/50 transition-colors ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                  }`}
+                >
+                  {/* Sr No */}
+                  <td className="px-4 py-3 text-sm font-medium text-gray-500">
                     {ride.srNo}
                   </td>
-                  <td className="px-6 py-4 text-sm">
-                    <span className="font-medium text-gray-900">
-                      {ride.riderName}
-                    </span>
-                    <br />
-                    <span className="text-xs text-gray-500">
-                      {ride.riderId}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 max-w-xs text-sm text-gray-500 truncate">
-                    {ride.pickupAddress}
-                  </td>
-                  <td className="px-6 py-4 max-w-xs text-sm text-gray-500 truncate">
-                    {ride.dropAddress}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {ride.pickupTime.split(",")[0]} <br />{" "}
-                    <span className="text-xs">
-                      {ride.pickupTime.split(",")[1]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {ride.isScheduled ? "Scheduled" : "Regular"}
+
+                  {/* Rider Details */}
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-gray-900">
+                        {ride.riderName}
+                      </span>
+                      <span className="text-xs text-gray-500 mt-0.5">
+                        {ride.riderId}
+                      </span>
+                      <span className="text-xs text-gray-400 mt-0.5">
+                        {ride.isScheduled ? "📅 Scheduled" : "⚡ Regular"}
+                      </span>
+                    </div>
                   </td>
 
-                  {/* Status Badge */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  {/* Route */}
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                        <span className="text-xs text-gray-600 line-clamp-1">
+                          {ride.pickupAddress}
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />
+                        <span className="text-xs text-gray-600 line-clamp-1">
+                          {ride.dropAddress}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Time */}
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-900">
+                        {ride.pickupTime.split(",")[0]}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {ride.pickupTime.split(",")[1]}
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Ride Type */}
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-medium border border-blue-100">
+                      {RIDE_TYPE_LABELS[ride.rideType]}
+                    </span>
+                  </td>
+
+                  {/* Ride Status */}
+                  <td className="px-4 py-3">
                     <RideStatusBadge status={ride.status} />
                   </td>
 
-                  {/* Action Dropdown Menu */}
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  {/* Payment Status */}
+                  <td className="px-4 py-3">
+                    <PaymentStatusBadge status={ride.paymentStatus} />
+                  </td>
+
+                  {/* Fare */}
+                  <td className="px-4 py-3">
+                    <span className="text-sm font-semibold text-gray-900">
+                      {ride.fare}
+                    </span>
+                  </td>
+
+                  {/* Action */}
+                  <td className="px-4 py-3 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger
                         onClick={() =>
@@ -878,7 +1175,7 @@ const RideRequestAdminPage: React.FC = () => {
                           onClick={() => openDriverResponseLog(ride)}
                           icon={<Truck className="h-4 w-4" />}
                         >
-                          Driver Response Log
+                          Driver Response
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => openViewDetail(ride)}

@@ -202,7 +202,7 @@ export const menuItems: MenuItem[] = [
 
       { id: "ride/pending", label: "Pending Rides" },
       { id: "ride/scheduled", label: "Scheduled Rides" },
-      { id: "operations/completed-history", label: "Completed History" },
+      { id: "ride/completed", label: "Completed Rides" },
       { id: "operations/cancelled-rides", label: "Cancelled Rides" },
       { id: "operations/driver-performance", label: "Driver Performance" },
     ],
