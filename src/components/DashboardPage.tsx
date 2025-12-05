@@ -112,7 +112,7 @@ export function DashboardPage({ metrics }: { metrics?: DashboardMetrics }) {
         <div>
           <h1
             // style={{ color: "var(--charcoal-dark)" }}
-            className="font-bold text-1xl sm:text-2xl  bg-(--charcoal-dark) text-white p-1 rounded-md"
+            className="font-normal text-1xl sm:text-2xl  bg-(--charcoal-dark) text-white p-1 rounded-md"
           >
             Admin Dashboard
           </h1>
@@ -162,7 +162,7 @@ export function DashboardPage({ metrics }: { metrics?: DashboardMetrics }) {
 
         {/* NEW SECTION — SERVICE TYPE BREAKDOWN */}
         <div>
-          <h2 className="font-bold text-xl mb-4 bg-(--charcoal-dark) text-white p-1 rounded-md">
+          <h2 className="font-normal text-xl mb-4 bg-(--charcoal-dark) text-white p-1 rounded-md">
             Service Type Breakdown
           </h2>
 
@@ -208,8 +208,8 @@ export function DashboardPage({ metrics }: { metrics?: DashboardMetrics }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="bg-white border-none shadow-md ">
             <CardHeader className="p-2 flex justify-center">
-              <CardTitle className="bg-(--charcoal-dark) text-white p-1 rounded-md w-60">
-                Bookings Trend (7 Days)
+              <CardTitle className="bg-gray-100 text-black  rounded-md w-55 p-1">
+                <p> Bookings Trend (7 Days)</p>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -238,8 +238,9 @@ export function DashboardPage({ metrics }: { metrics?: DashboardMetrics }) {
 
           <Card className="bg-white border-none shadow-md">
             <CardHeader className=" p-2 flex justify-center">
-              <CardTitle className="bg-(--charcoal-dark) text-white p-1 rounded-md text-center mb-1 w-65">
-                Revenue Trend (7 Days)
+              <CardTitle className="bg-gray-100 text-black p-1 rounded-md text-center mb-1 w-55">
+                <p>Revenue Trend (7 Days)</p>
+                
               </CardTitle>
             </CardHeader>
             <CardContent>

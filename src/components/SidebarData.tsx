@@ -197,14 +197,15 @@ export const menuItems: MenuItem[] = [
       //     },
       //   ],
       // },
+      { id: "ride", label: "Ride Dashboard" },
       { id: "ride/ride-requests", label: "Ride Requests" },
       { id: "ride/customer-rides", label: "Customer Rides" },
 
       { id: "ride/pending", label: "Pending Rides" },
       { id: "ride/scheduled", label: "Scheduled Rides" },
       { id: "ride/completed", label: "Completed Rides" },
-      { id: "operations/cancelled-rides", label: "Cancelled Rides" },
-      { id: "operations/driver-performance", label: "Driver Performance" },
+      { id: "ride/cancelled", label: "Cancelled Rides" },
+      // { id: "operations/driver-performance", label: "Driver Performance" },
     ],
   },
   {
