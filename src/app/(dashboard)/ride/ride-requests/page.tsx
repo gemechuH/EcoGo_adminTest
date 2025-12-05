@@ -2463,41 +2463,37 @@ const RideRequestAdminPage: React.FC = () => {
               {filteredRides.length}
             </p>
             <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                className="p-2 h-8 w-8"
+              <button
+                className="p-2 h-8 w-8 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50"
                 onClick={() => handlePageChange(1)}
                 disabled={currentPage === 1}
               >
-                <ChevronsLeft className="h-4 w-4 text-black" />
-              </Button>
-              <Button
-                variant="outline"
-                className="p-2 h-8 w-8"
+                <ChevronsLeft className="h-4 w-4 text-gray-900" />
+              </button>
+              <button
+                className="p-2 h-8 w-8 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
               >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
+                <ChevronLeft className="h-4 w-4 text-gray-900" />
+              </button>
               <span className="flex items-center justify-center h-8 px-3 text-sm font-medium bg-gray-900 text-white rounded-lg">
                 {currentPage} / {totalPages}
               </span>
-              <Button
-                variant="outline"
-                className="p-2 h-8 w-8 text-black"
+              <button
+                className="p-2 h-8 w-8 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                className="p-2 h-8 w-8"
+                <ChevronRight className="h-4 w-4 text-gray-900" />
+              </button>
+              <button
+                className="p-2 h-8 w-8 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50"
                 onClick={() => handlePageChange(totalPages)}
                 disabled={currentPage === totalPages}
               >
-                <ChevronsRight className="h-4 w-4" />
-              </Button>
+                <ChevronsRight className="h-4 w-4 text-gray-900" />
+              </button>
             </div>
           </div>
         )}
