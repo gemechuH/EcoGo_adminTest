@@ -214,7 +214,10 @@ interface CompletedRide {
   rideType: string;
   vehicleType: string;
   rating: number;
+  riderRating: number;
+  driverRating: number;
   feedback?: string;
+  riderFeedback?: string;
 }
 
 // --- MOCK DATA ---
@@ -389,8 +392,12 @@ const generateMockRides = (count: number): CompletedRide[] => {
       rideType: RIDE_TYPES[i % RIDE_TYPES.length],
       vehicleType: VEHICLE_TYPES[i % VEHICLE_TYPES.length],
       rating: 3 + Math.random() * 2,
+      riderRating: 3.5 + Math.random() * 1.5,
+      driverRating: 3.5 + Math.random() * 1.5,
       feedback:
         Math.random() > 0.6 ? "Great ride! Very comfortable." : undefined,
+      riderFeedback:
+        Math.random() > 0.7 ? "Polite and friendly passenger." : undefined,
     });
   }
 
@@ -529,12 +536,12 @@ const RideDetailModal: React.FC<{
       title={`Ride Details - ${ride.id}`}
       size="xl"
     >
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Ride Summary Header */}
         <div className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
           <div>
             <p className="text-xs text-emerald-600 font-medium">Total Fare</p>
-            <p className="text-3xl font-bold text-emerald-700">
+            <p className="text-2xl font-bold text-emerald-700">
               ${ride.totalFare.toFixed(2)}
             </p>
           </div>
@@ -625,14 +632,14 @@ const RideDetailModal: React.FC<{
         </div>
 
         {/* Route Details */}
-        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-          <div className="flex items-center gap-2 mb-4">
+        <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+          <div className="flex items-center gap-2 mb-2">
             <Navigation className="w-4 h-4 text-gray-600" />
             <span className="text-sm font-semibold text-gray-700">
               Route Details
             </span>
           </div>
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-2">
             <div className="flex flex-col items-center">
               <div className="w-3 h-3 rounded-full bg-emerald-500 border-2 border-emerald-200" />
               <div className="w-0.5 h-16 bg-gray-300" />
@@ -786,26 +793,441 @@ const RideDetailModal: React.FC<{
                 Rating & Feedback
               </span>
             </div>
-            <div className="flex items-center gap-2 mb-2">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className={`w-5 h-5 ${
-                    star <= Math.round(ride.rating)
-                      ? "fill-amber-400 text-amber-400"
-                      : "text-gray-300"
-                  }`}
-                />
-              ))}
-              <span className="text-sm font-medium text-gray-700 ml-1">
-                {ride.rating.toFixed(1)}
+
+            {/* Driver Rating (given by rider) */}
+            <div className="mb-4">
+              <p className="text-xs text-gray-500 mb-1">
+                Driver Rating (by Rider)
+              </p>
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`w-5 h-5 ${
+                      star <= Math.round(ride.driverRating)
+                        ? "fill-amber-400 text-amber-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+                <span className="text-sm font-medium text-gray-700 ml-1">
+                  {ride.driverRating.toFixed(1)}
+                </span>
+              </div>
+              {ride.feedback && (
+                <p className="text-sm text-gray-600 italic mt-1">
+                  &quot;{ride.feedback}&quot;
+                </p>
+              )}
+            </div>
+
+            {/* Rider Rating (given by driver) */}
+            <div>
+              <p className="text-xs text-gray-500 mb-1">
+                Rider Rating (by Driver)
+              </p>
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={`rider-${star}`}
+                    className={`w-5 h-5 ${
+                      star <= Math.round(ride.riderRating)
+                        ? "fill-amber-400 text-amber-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+                <span className="text-sm font-medium text-gray-700 ml-1">
+                  {ride.riderRating.toFixed(1)}
+                </span>
+              </div>
+              {ride.riderFeedback && (
+                <p className="text-sm text-gray-600 italic mt-1">
+                  &quot;{ride.riderFeedback}&quot;
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Dialog>
+  );
+};
+
+// --- TRANSACTION DETAIL MODAL ---
+const TransactionDetailModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  ride: CompletedRide | null;
+}> = ({ isOpen, onClose, ride }) => {
+  if (!ride) return null;
+
+  const platformFee = ride.totalFare * 0.15;
+  const driverEarnings = ride.totalFare - platformFee - ride.taxes;
+  const netRevenue = platformFee + ride.taxes;
+
+  const formatCurrency = (amount: number) => `$${amount.toFixed(2)}`;
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  return (
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Transaction Details"
+      size="xl"
+    >
+      <div className="space-y-5">
+        {/* Transaction Header */}
+        <div className="bg-gray-900 text-white rounded-xl p-5">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">
+                Transaction ID
+              </p>
+              <p className="text-lg font-mono font-bold">
+                {ride.transactionId}
+              </p>
+            </div>
+            <div className="text-right">
+              <PaymentStatusBadge status={ride.paymentStatus} />
+              <p className="text-xs text-gray-400 mt-2">
+                {formatDate(ride.completedAt)}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-700">
+            <p className="text-xs text-gray-400">Total Transaction Amount</p>
+            <p className="text-3xl font-bold">
+              {formatCurrency(ride.totalFare)}
+            </p>
+          </div>
+        </div>
+
+        {/* Accounting Summary */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+            <p className="text-xs text-emerald-600 font-medium">
+              Gross Revenue
+            </p>
+            <p className="text-xl font-bold text-emerald-700">
+              {formatCurrency(ride.totalFare)}
+            </p>
+          </div>
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+            <p className="text-xs text-blue-600 font-medium">
+              Platform Commission
+            </p>
+            <p className="text-xl font-bold text-blue-700">
+              {formatCurrency(platformFee)}
+            </p>
+          </div>
+          <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
+            <p className="text-xs text-purple-600 font-medium">Driver Payout</p>
+            <p className="text-xl font-bold text-purple-700">
+              {formatCurrency(driverEarnings)}
+            </p>
+          </div>
+        </div>
+
+        {/* Journal Entry (Accounting) */}
+        <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-gray-100 px-4 py-2 border-b border-gray-200">
+            <h4 className="text-sm font-semibold text-gray-700">
+              Journal Entry
+            </h4>
+          </div>
+          <div className="p-4">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-xs text-gray-500 uppercase">
+                  <th className="text-left pb-2">Account</th>
+                  <th className="text-right pb-2">Debit</th>
+                  <th className="text-right pb-2">Credit</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                <tr>
+                  <td className="py-2 text-gray-900">
+                    Cash / Payment Receivable
+                  </td>
+                  <td className="py-2 text-right font-mono text-gray-900">
+                    {formatCurrency(ride.totalFare)}
+                  </td>
+                  <td className="py-2 text-right font-mono text-gray-400">—</td>
+                </tr>
+                <tr>
+                  <td className="py-2 text-gray-600 pl-4">→ Ride Revenue</td>
+                  <td className="py-2 text-right font-mono text-gray-400">—</td>
+                  <td className="py-2 text-right font-mono text-gray-900">
+                    {formatCurrency(ride.baseFare)}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 text-gray-600 pl-4">
+                    → Platform Fee Income
+                  </td>
+                  <td className="py-2 text-right font-mono text-gray-400">—</td>
+                  <td className="py-2 text-right font-mono text-gray-900">
+                    {formatCurrency(platformFee)}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 text-gray-600 pl-4">
+                    → Tax Collected (Liability)
+                  </td>
+                  <td className="py-2 text-right font-mono text-gray-400">—</td>
+                  <td className="py-2 text-right font-mono text-gray-900">
+                    {formatCurrency(ride.taxes)}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 text-gray-600 pl-4">→ Driver Payable</td>
+                  <td className="py-2 text-right font-mono text-gray-400">—</td>
+                  <td className="py-2 text-right font-mono text-gray-900">
+                    {formatCurrency(driverEarnings)}
+                  </td>
+                </tr>
+                {ride.tip > 0 && (
+                  <tr>
+                    <td className="py-2 text-gray-600 pl-4">
+                      → Tips Payable (Driver)
+                    </td>
+                    <td className="py-2 text-right font-mono text-gray-400">
+                      —
+                    </td>
+                    <td className="py-2 text-right font-mono text-gray-900">
+                      {formatCurrency(ride.tip)}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-gray-300">
+                  <td className="pt-2 font-semibold text-gray-900">Total</td>
+                  <td className="pt-2 text-right font-mono font-semibold text-gray-900">
+                    {formatCurrency(ride.totalFare)}
+                  </td>
+                  <td className="pt-2 text-right font-mono font-semibold text-gray-900">
+                    {formatCurrency(ride.totalFare)}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        {/* Fare Breakdown */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+            <h4 className="text-sm font-semibold text-gray-700 mb-3">
+              Fare Breakdown
+            </h4>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Base Fare</span>
+                <span className="font-medium text-gray-900">
+                  {formatCurrency(ride.baseFare)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">
+                  Distance ({ride.distance} mi × $1.50)
+                </span>
+                <span className="font-medium text-gray-900">
+                  {formatCurrency(ride.distance * 1.5)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">
+                  Time ({ride.duration} min × $0.30)
+                </span>
+                <span className="font-medium text-gray-900">
+                  {formatCurrency(ride.duration * 0.3)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Taxes & Fees</span>
+                <span className="font-medium text-gray-900">
+                  {formatCurrency(ride.taxes)}
+                </span>
+              </div>
+              {ride.tip > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Tip</span>
+                  <span className="font-medium text-emerald-600">
+                    {formatCurrency(ride.tip)}
+                  </span>
+                </div>
+              )}
+              <div className="border-t border-gray-200 pt-2 mt-2">
+                <div className="flex justify-between font-semibold">
+                  <span className="text-gray-900">Total</span>
+                  <span className="text-gray-900">
+                    {formatCurrency(ride.totalFare)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+            <h4 className="text-sm font-semibold text-gray-700 mb-3">
+              Revenue Distribution
+            </h4>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Driver Earnings (85%)</span>
+                <span className="font-medium text-gray-900">
+                  {formatCurrency(driverEarnings)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Platform Fee (15%)</span>
+                <span className="font-medium text-gray-900">
+                  {formatCurrency(platformFee)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Tax Collected</span>
+                <span className="font-medium text-gray-900">
+                  {formatCurrency(ride.taxes)}
+                </span>
+              </div>
+              {ride.tip > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Driver Tip (100%)</span>
+                  <span className="font-medium text-emerald-600">
+                    {formatCurrency(ride.tip)}
+                  </span>
+                </div>
+              )}
+              <div className="border-t border-gray-200 pt-2 mt-2">
+                <div className="flex justify-between font-semibold">
+                  <span className="text-gray-900">Net Platform Revenue</span>
+                  <span className="text-emerald-600">
+                    {formatCurrency(netRevenue)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Details */}
+        <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3">
+            Payment Information
+          </h4>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Payment Method</span>
+                <PaymentMethodBadge method={ride.paymentMethod} />
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Payment Status</span>
+                <PaymentStatusBadge status={ride.paymentStatus} />
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Transaction Date</span>
+                <span className="font-medium text-gray-900">
+                  {ride.completedAt.toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Reference ID</span>
+                <span className="font-mono text-gray-900">
+                  {ride.transactionId}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Ride ID</span>
+                <span className="font-mono text-gray-900">{ride.id}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Settlement Status</span>
+                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">
+                  Settled
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Parties Involved */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-blue-50 rounded-xl border border-blue-200 p-4">
+            <h4 className="text-sm font-semibold text-blue-700 mb-2">
+              Payer (Rider)
+            </h4>
+            <p className="text-sm font-medium text-gray-900">
+              {ride.rider.name}
+            </p>
+            <p className="text-xs text-gray-500">{ride.rider.email}</p>
+            <p className="text-xs text-gray-500">{ride.rider.phone}</p>
+          </div>
+          <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-4">
+            <h4 className="text-sm font-semibold text-emerald-700 mb-2">
+              Payee (Driver)
+            </h4>
+            <p className="text-sm font-medium text-gray-900">
+              {ride.driver.name}
+            </p>
+            <p className="text-xs text-gray-500">{ride.driver.email}</p>
+            <p className="text-xs text-gray-500">
+              Vehicle: {ride.driver.vehicleNumber}
+            </p>
+          </div>
+        </div>
+
+        {/* Audit Trail */}
+        <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3">
+            Audit Trail
+          </h4>
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+              <span className="text-gray-500">
+                {formatDate(ride.completedAt)}
+              </span>
+              <span className="text-gray-700">
+                Payment authorized and captured
               </span>
             </div>
-            {ride.feedback && (
-              <p className="text-sm text-gray-600 italic">
-                &quot;{ride.feedback}&quot;
-              </p>
-            )}
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span className="text-gray-500">
+                {formatDate(ride.completedAt)}
+              </span>
+              <span className="text-gray-700">
+                Ride completed - fare calculated
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span className="text-gray-500">
+                {formatDate(new Date(ride.completedAt.getTime() + 86400000))}
+              </span>
+              <span className="text-gray-700">Driver payout scheduled</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+              <span className="text-gray-500">
+                {formatDate(new Date(ride.completedAt.getTime() + 172800000))}
+              </span>
+              <span className="text-gray-700">Settlement completed</span>
+            </div>
           </div>
         </div>
       </div>
@@ -828,6 +1250,7 @@ export const OperationsPage: React.FC<OperationsPageProps> = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRide, setSelectedRide] = useState<CompletedRide | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
 
   // Filter rides based on time
@@ -946,13 +1369,13 @@ export const OperationsPage: React.FC<OperationsPageProps> = () => {
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       {/* Page Header */}
       <div className="mb-6">
-        <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-3 rounded-lg shadow-sm">
-          <h1 className="text-xl font-semibold">Completed Rides</h1>
+        <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-2 py-2 rounded-lg shadow-sm">
+          <h1 className="text-xl font-normal">Completed Rides</h1>
         </div>
         <nav className="flex items-center gap-2 mt-2 text-sm">
           <Link
             href="/ride"
-            className="text-emerald-600 hover:text-emerald-700 hover:underline font-medium flex items-center gap-1"
+            className="text-black hover:text-emerald-700 hover:underline font-medium flex items-center gap-1"
           >
             <Home className="w-3.5 h-3.5" />
             Home
@@ -985,7 +1408,7 @@ export const OperationsPage: React.FC<OperationsPageProps> = () => {
             }}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               timeFilter === tab.key
-                ? "bg-emerald-600 text-white shadow-sm"
+                ? "bg-gray-900 text-white shadow-sm"
                 : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
             }`}
           >
@@ -1109,12 +1532,11 @@ export const OperationsPage: React.FC<OperationsPageProps> = () => {
 
       {/* Table Card */}
       <Card>
-        <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-gray-500" />
-            <h2 className="font-semibold text-gray-800">
+        <div className="p-1 border-b border-gray-100 flex items-center justify-between">
+          <div className="w-full gap-2 bg-gray-900 text-white p-1 rounded">
+            <h4 className="font-normal text-white">
               Ride History ({filteredRides.length})
-            </h2>
+            </h4>
           </div>
         </div>
 
@@ -1122,34 +1544,37 @@ export const OperationsPage: React.FC<OperationsPageProps> = () => {
           <table className="min-w-full">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                {/* <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                   #
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                </th> */}
+                <th className="px-2 py-2 text-left text-sm font-semibold text-gray-800 ">
                   Ride ID
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase min-w-[180px]">
-                  Rider
+                <th className="px-2 py-2 text-left text-sm font-semibold text-gray-800  min-w-[140px]">
+                  Rider Info
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase min-w-[180px]">
-                  Driver
+                <th className="px-2 py-2 text-left text-sm font-semibold text-gray-800  min-w-[140px]">
+                  Driver Info
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase min-w-[200px]">
-                  Route
+                <th className="px-2 py-2 text-left text-sm font-semibold text-gray-800  min-w-[140px]">
+                  Pickup
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                <th className="px-2 py-2 text-left text-sm font-semibold text-gray-800  min-w-[140px]">
+                  Drop
+                </th>
+                <th className="px-2 py-2 text-left text-sm font-semibold text-gray-800 ">
                   Completed
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                <th className="px-2 py-2 text-left text-sm font-semibold text-gray-800 ">
                   Fare
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                <th className="px-2 py-2 text-left text-sm font-semibold text-gray-800 ">
                   Payment
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                <th className="px-2 py-2 text-left text-sm font-semibold text-gray-800 ">
                   Rating
                 </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase">
+                <th className="px-2 py-2 text-center text-sm font-semibold text-gray-800 ">
                   Action
                 </th>
               </tr>
@@ -1162,63 +1587,45 @@ export const OperationsPage: React.FC<OperationsPageProps> = () => {
                     idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"
                   }`}
                 >
-                  <td className="px-4 py-3 text-sm text-gray-500">
+                  {/* <td className="px-4 py-3 text-sm text-gray-500">
                     {ride.srNo}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-sm font-mono text-gray-900">
+                  </td> */}
+                  <td className="px-2 py-3">
+                    <span className="text-xs font-mono text-gray-900">
                       {ride.id}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                        <User className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {ride.rider.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {ride.rider.phone}
-                        </p>
-                      </div>
-                    </div>
+                  <td className="px-2 py-3">
+                    <p className="text-xs text-gray-900">
+                      <span className="font-bold">N:</span> {ride.rider.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      <span className="font-bold text-gray-700">P:</span>{" "}
+                      {ride.rider.phone}
+                    </p>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                        <Car className="w-4 h-4 text-emerald-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {ride.driver.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {ride.driver.vehicleNumber}
-                        </p>
-                      </div>
-                    </div>
+                  <td className="px-2 py-3">
+                    <p className="text-xs text-gray-900">
+                      <span className="font-bold">N:</span> {ride.driver.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      <span className="font-bold text-gray-700">V:</span>{" "}
+                      {ride.driver.vehicleNumber}
+                    </p>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                        <span className="text-xs text-gray-600 truncate max-w-[160px]">
-                          {ride.pickupAddress}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
-                        <span className="text-xs text-gray-600 truncate max-w-[160px]">
-                          {ride.dropAddress}
-                        </span>
-                      </div>
-                    </div>
+                  <td className="px-2 py-3">
+                    <p className="text-xs text-gray-900 truncate max-w-[160px]">
+                      {ride.pickupAddress}
+                    </p>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-2 py-3">
+                    <p className="text-xs text-gray-900 truncate max-w-[160px]">
+                      {ride.dropAddress}
+                    </p>
+                  </td>
+                  <td className="px-2 py-3">
                     <div>
-                      <p className="text-sm text-gray-900">
+                      <p className="text-xs text-gray-900">
                         {ride.completedAt.toLocaleDateString()}
                       </p>
                       <p className="text-xs text-gray-500">
@@ -1229,21 +1636,21 @@ export const OperationsPage: React.FC<OperationsPageProps> = () => {
                       </p>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
-                    <span className="text-sm font-semibold text-gray-900">
+                  <td className="px-2 py-3">
+                    <span className="text-xs font-semibold text-gray-900">
                       ${ride.totalFare.toFixed(2)}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-2 py-3">
                     <div className="space-y-1">
-                      <PaymentMethodBadge method={ride.paymentMethod} />
+                      {/* <PaymentMethodBadge method={ride.paymentMethod} /> */}
                       <PaymentStatusBadge status={ride.paymentStatus} />
                     </div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-2 py-3">
                     <RatingStars rating={ride.rating} />
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-2 py-2 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger
                         onClick={() =>
@@ -1275,7 +1682,8 @@ export const OperationsPage: React.FC<OperationsPageProps> = () => {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
-                            // View transaction logic
+                            setSelectedRide(ride);
+                            setIsTransactionModalOpen(true);
                             setActionMenuOpen(null);
                           }}
                           icon={<Receipt className="h-4 w-4 text-gray-500" />}
@@ -1293,7 +1701,6 @@ export const OperationsPage: React.FC<OperationsPageProps> = () => {
 
         {filteredRides.length === 0 && (
           <div className="p-8 text-center">
-            <Car className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">No completed rides found</p>
           </div>
         )}
@@ -1307,41 +1714,37 @@ export const OperationsPage: React.FC<OperationsPageProps> = () => {
               {filteredRides.length} rides
             </p>
             <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                className="p-2 h-8 w-8"
+              <button
+                className="p-2 h-8 w-8 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center"
                 onClick={() => setCurrentPage(1)}
                 disabled={currentPage === 1}
               >
-                <ChevronsLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                className="p-2 h-8 w-8"
+                <ChevronsLeft className="h-4 w-4 text-gray-900" />
+              </button>
+              <button
+                className="p-2 h-8 w-8 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center"
                 onClick={() => setCurrentPage((p) => p - 1)}
                 disabled={currentPage === 1}
               >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="flex items-center justify-center h-8 px-3 text-sm font-medium bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200">
+                <ChevronLeft className="h-4 w-4 text-gray-900" />
+              </button>
+              <span className="flex items-center justify-center h-8 px-3 text-sm font-medium bg-gray-900 text-white rounded-lg">
                 {currentPage} / {totalPages}
               </span>
-              <Button
-                variant="outline"
-                className="p-2 h-8 w-8"
+              <button
+                className="p-2 h-8 w-8 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center"
                 onClick={() => setCurrentPage((p) => p + 1)}
                 disabled={currentPage === totalPages}
               >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                className="p-2 h-8 w-8"
+                <ChevronRight className="h-4 w-4 text-gray-900" />
+              </button>
+              <button
+                className="p-2 h-8 w-8 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center"
                 onClick={() => setCurrentPage(totalPages)}
                 disabled={currentPage === totalPages}
               >
-                <ChevronsRight className="h-4 w-4" />
-              </Button>
+                <ChevronsRight className="h-4 w-4 text-gray-900" />
+              </button>
             </div>
           </div>
         )}
@@ -1351,6 +1754,13 @@ export const OperationsPage: React.FC<OperationsPageProps> = () => {
       <RideDetailModal
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
+        ride={selectedRide}
+      />
+
+      {/* Transaction Detail Modal */}
+      <TransactionDetailModal
+        isOpen={isTransactionModalOpen}
+        onClose={() => setIsTransactionModalOpen(false)}
         ride={selectedRide}
       />
     </div>

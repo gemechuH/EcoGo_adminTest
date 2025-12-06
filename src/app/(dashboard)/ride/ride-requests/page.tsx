@@ -40,7 +40,7 @@ import {
 
 // --- CONFIGURATION & MOCK UI COMPONENTS ---
 
-const GREEN_BRAND_COLOR = "bg-[#2DB85B] hover:bg-green-700";
+const GREEN_BRAND_COLOR = "bg-[#2DB85B] hover:bg-[#2DB85B]/90";
 const PAGE_SIZE = 10;
 const TOTAL_MOCK_RIDES = 35;
 const RIDER_MOCK_ID = "rider@example.com";
@@ -83,7 +83,7 @@ const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = (
   props
 ) => (
   <select
-    className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+    className="flex h-11 w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:border-emerald-500 focus-visible:ring-2 focus-visible:ring-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50 transition-colors cursor-pointer"
     {...props}
   />
 );
@@ -570,7 +570,7 @@ const CreateRideModal: React.FC<{
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="relative w-full max-w-4xl transform rounded-2xl bg-white shadow-2xl transition-all">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-t-2xl">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-[#2F3A3F] to-emerald-900 rounded-t-2xl">
             <div>
               <h3 className="text-xl font-bold text-white">
                 Create New Ride Request
@@ -598,8 +598,9 @@ const CreateRideModal: React.FC<{
                   <h4 className="text-lg font-semibold text-gray-900 mb-2">
                     Find Rider
                   </h4>
-                  <p className="text-gray-500 text-sm mb-6">
-                    Enter rider email or phone number to continue
+                  <p className="text-gray-700 text-sm mb-6">
+                    Enter rider <span className="font-bold underline">email</span> or <span className="font-bold underline">phone</span> number
+                    to continue
                   </p>
 
                   <div className="max-w-md mx-auto space-y-4">
@@ -615,7 +616,7 @@ const CreateRideModal: React.FC<{
                     <Button
                       onClick={handleRiderCheck}
                       disabled={!riderIdentifier}
-                      className="w-full h-12"
+                      className="w-full h-10 text-center justify-center"
                     >
                       <Search className="w-4 h-4" /> Search Rider
                     </Button>
@@ -624,10 +625,10 @@ const CreateRideModal: React.FC<{
                   {!isRiderFound && riderIdentifier && (
                     <div className="mt-4 p-4 bg-red-50 rounded-xl max-w-md mx-auto">
                       <p className="text-red-600 text-sm">
-                        Rider not found.{" "}
-                        <a href="#" className="underline font-medium">
+                        Rider not found?{" "}
+                        <Link href="/rider" className="underline font-medium">
                           Create new rider
-                        </a>
+                        </Link>
                       </p>
                     </div>
                   )}
@@ -796,7 +797,7 @@ const CreateRideModal: React.FC<{
                 {/* Ride Details */}
                 <div className="bg-gray-50 rounded-xl p-5">
                   <h4 className="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <Car className="w-4 h-4" /> Ride Details
+                    <Car className="w-2 h-3" /> Ride Details
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
@@ -957,15 +958,13 @@ const PaymentStatusBadge: React.FC<{ status: PaymentStatus }> = ({
   );
 };
 
-// View Detail Modal - Uber Style Full Information
+// View Detail Modal - Clean Two-Tab Layout
 const ViewDetailModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
   ride: Ride;
 }> = ({ isOpen, onClose, ride }) => {
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "timeline" | "payment"
-  >("overview");
+  const [activeTab, setActiveTab] = useState<"details" | "payment">("details");
 
   if (!isOpen) return null;
 
@@ -990,647 +989,525 @@ const ViewDetailModal: React.FC<{
     return `${formatDate(date)} at ${formatTime(date)}`;
   };
 
+  // Info Row Component
+  const InfoRow = ({
+    label,
+    value,
+    mono = false,
+  }: {
+    label: string;
+    value: string | React.ReactNode;
+    mono?: boolean;
+  }) => (
+    <div className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
+      <span className="text-sm text-gray-500">{label}</span>
+      <span
+        className={`text-sm font-medium text-gray-900 ${
+          mono ? "font-mono" : ""
+        }`}
+      >
+        {value}
+      </span>
+    </div>
+  );
+
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-sm">
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative w-full max-w-6xl transform rounded-2xl bg-white shadow-2xl transition-all max-h-[95vh] flex flex-col">
+        <div className="relative w-full max-w-5xl transform rounded-2xl bg-white shadow-2xl transition-all max-h-[95vh] flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 bg-gray-900 rounded-t-2xl shrink-0">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-900 rounded-t-2xl shrink-0">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
-                <Car className="w-6 h-6 text-white" />
-              </div>
               <div>
                 <div className="flex items-center gap-3">
-                  <h3 className="text-xl font-bold text-white">
-                    Ride Request Details
-                  </h3>
+                  <h3 className="text-base font-bold text-white">Ride Details</h3>
+                  <span className="text-gray-400 font-mono text-sm">
+                    #{ride.id}
+                  </span>
                   <RideStatusBadge status={ride.status} />
                 </div>
                 <p className="text-gray-400 text-sm mt-0.5">
-                  Request ID:{" "}
-                  <span className="font-mono text-gray-300">{ride.id}</span>
+                  Requested on {formatDateTime(ride.requestDate)}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2.5 rounded-xl hover:bg-white/10 transition-colors"
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
             >
               <X className="h-5 w-5 text-white" />
             </button>
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex border-b border-gray-100 px-6 shrink-0 bg-gray-50">
-            {[
-              { id: "overview", label: "Overview", icon: FileText },
-              { id: "timeline", label: "Timeline", icon: Clock },
-              { id: "payment", label: "Payment", icon: Wallet },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === tab.id
-                    ? "border-gray-900 text-gray-900"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            ))}
+          <div className="flex border-b border-gray-200 px-6 shrink-0 bg-white">
+            <button
+              onClick={() => setActiveTab("details")}
+              className={`px-6 py-3 text-sm font-semibold border-b-2 transition-colors ${
+                activeTab === "details"
+                  ? "border-gray-900 text-gray-900"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Ride Details
+            </button>
+            <button
+              onClick={() => setActiveTab("payment")}
+              className={`px-6 py-3 text-sm font-semibold border-b-2 transition-colors ${
+                activeTab === "payment"
+                  ? "border-gray-900 text-gray-900"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Payment & Timeline
+            </button>
           </div>
 
           {/* Content */}
           <div className="p-6 overflow-y-auto flex-1">
-            {activeTab === "overview" && (
-              <div className="space-y-6">
-                {/* Quick Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-100">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
-                        <Route className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {ride.distance} km
-                        </p>
-                        <p className="text-xs text-gray-500">Total Distance</p>
-                      </div>
+            {activeTab === "details" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left Column */}
+                <div className="space-y-5">
+                  {/* Quick Stats Row */}
+                  <div className="grid grid-cols-4 gap-3">
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <p className="text-xl font-bold text-gray-900">
+                        {ride.distance}
+                      </p>
+                      <p className="text-xs text-gray-500">km</p>
                     </div>
-                  </div>
-                  <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-xl p-4 border border-amber-100">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-amber-500 flex items-center justify-center">
-                        <Timer className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {ride.duration} min
-                        </p>
-                        <p className="text-xs text-gray-500">Est. Duration</p>
-                      </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <p className="text-xl font-bold text-gray-900">
+                        {ride.duration}
+                      </p>
+                      <p className="text-xs text-gray-500">min</p>
                     </div>
-                  </div>
-                  <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-xl p-4 border border-emerald-100">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-emerald-500 flex items-center justify-center">
-                        <DollarSign className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-gray-900">
-                          ₹{ride.fare}
-                        </p>
-                        <p className="text-xs text-gray-500">Total Fare</p>
-                      </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <p className="text-xl font-bold text-gray-900">
+                        ₹{ride.fare}
+                      </p>
+                      <p className="text-xs text-gray-500">fare</p>
                     </div>
-                  </div>
-                  <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-4 border border-purple-100">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center">
-                        <Car className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {ride.vehicleType}
-                        </p>
-                        <p className="text-xs text-gray-500">Vehicle Type</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Customer Info */}
-                  <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                    <div className="bg-emerald-600 px-5 py-3">
-                      <h4 className="text-sm font-semibold text-white flex items-center gap-2">
-                        <User className="w-4 h-4" /> Customer Information
-                      </h4>
-                    </div>
-                    <div className="p-5">
-                      <div className="flex items-center gap-4 mb-4 pb-4 border-b border-gray-100">
-                        <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center">
-                          <User className="w-8 h-8 text-emerald-600" />
-                        </div>
-                        <div>
-                          <p className="text-lg font-bold text-gray-900">
-                            {ride.customer.name}
-                          </p>
-                          <div className="flex items-center gap-1 text-amber-500">
-                            <Star className="w-4 h-4 fill-current" />
-                            <span className="text-sm font-medium">
-                              {ride.customer.rating.toFixed(1)}
-                            </span>
-                            <span className="text-xs text-gray-400 ml-1">
-                              ({ride.customer.totalRides} rides)
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-2.5 bg-gray-50 rounded-lg">
-                          <Phone className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Phone</p>
-                            <p className="text-sm font-medium text-gray-900">
-                              {ride.customer.phone}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 p-2.5 bg-gray-50 rounded-lg">
-                          <Mail className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Email</p>
-                            <p className="text-sm font-medium text-gray-900">
-                              {ride.customer.email}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 p-2.5 bg-gray-50 rounded-lg">
-                          <FileText className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Customer ID</p>
-                            <p className="text-sm font-medium text-gray-900 font-mono">
-                              {ride.customer.id}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <p className="text-lg font-bold text-gray-900">
+                        {ride.vehicleType}
+                      </p>
+                      <p className="text-xs text-gray-500">vehicle</p>
                     </div>
                   </div>
 
-                  {/* Driver Info */}
-                  <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                    <div className="bg-blue-600 px-5 py-3">
-                      <h4 className="text-sm font-semibold text-white flex items-center gap-2">
-                        <Truck className="w-4 h-4" /> Driver Information
-                      </h4>
-                    </div>
-                    <div className="p-5">
-                      {ride.driver ? (
-                        <>
-                          <div className="flex items-center gap-4 mb-4 pb-4 border-b border-gray-100">
-                            <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
-                              <User className="w-8 h-8 text-blue-600" />
-                            </div>
-                            <div>
-                              <p className="text-lg font-bold text-gray-900">
-                                {ride.driver.name}
-                              </p>
-                              <div className="flex items-center gap-1 text-amber-500">
-                                <Star className="w-4 h-4 fill-current" />
-                                <span className="text-sm font-medium">
-                                  {ride.driver.rating.toFixed(1)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-3 p-2.5 bg-gray-50 rounded-lg">
-                              <Phone className="w-4 h-4 text-gray-400" />
-                              <div>
-                                <p className="text-xs text-gray-500">Phone</p>
-                                <p className="text-sm font-medium text-gray-900">
-                                  {ride.driver.phone}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-3 p-2.5 bg-gray-50 rounded-lg">
-                              <Car className="w-4 h-4 text-gray-400" />
-                              <div>
-                                <p className="text-xs text-gray-500">Vehicle</p>
-                                <p className="text-sm font-medium text-gray-900">
-                                  {ride.driver.vehicleModel}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-3 p-2.5 bg-gray-50 rounded-lg">
-                              <FileText className="w-4 h-4 text-gray-400" />
-                              <div>
-                                <p className="text-xs text-gray-500">
-                                  Vehicle Number
-                                </p>
-                                <p className="text-sm font-bold text-gray-900 font-mono">
-                                  {ride.driver.vehicleNumber}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center py-8 text-center">
-                          <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-3">
-                            <AlertCircle className="w-8 h-8 text-amber-500" />
-                          </div>
-                          <p className="text-sm font-medium text-gray-700">
-                            No Driver Assigned
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Waiting for driver acceptance
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Ride Details */}
-                  <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                    <div className="bg-gray-800 px-5 py-3">
-                      <h4 className="text-sm font-semibold text-white flex items-center gap-2">
-                        <FileText className="w-4 h-4" /> Ride Details
-                      </h4>
-                    </div>
-                    <div className="p-5 space-y-3">
-                      <div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
-                        <span className="text-sm text-gray-500">
-                          Request ID
-                        </span>
-                        <span className="text-sm font-mono font-bold text-gray-900">
-                          {ride.id}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
-                        <span className="text-sm text-gray-500">Ride Type</span>
-                        <Badge color="info">
-                          {RIDE_TYPE_LABELS[ride.rideType]}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
-                        <span className="text-sm text-gray-500">
-                          Vehicle Type
-                        </span>
-                        <span className="text-sm font-medium text-gray-900">
-                          {ride.vehicleType}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
-                        <span className="text-sm text-gray-500">Status</span>
-                        <RideStatusBadge status={ride.status} />
-                      </div>
-                      <div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
-                        <span className="text-sm text-gray-500">Payment</span>
-                        <PaymentStatusBadge status={ride.paymentStatus} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Route Section */}
-                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                  <div className="bg-gray-100 px-5 py-3 border-b border-gray-200">
-                    <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-gray-600" /> Route
-                      Information
+                  {/* Customer Section */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                      Customer
                     </h4>
-                  </div>
-                  <div className="p-5">
-                    <div className="flex gap-4">
-                      {/* Route Timeline */}
-                      <div className="flex flex-col items-center">
-                        <div className="w-4 h-4 rounded-full bg-emerald-500 border-4 border-emerald-100" />
-                        <div className="w-0.5 h-16 bg-gray-300 my-1" />
-                        <div className="w-4 h-4 rounded-full bg-gray-800 border-4 border-gray-200" />
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                        <User className="w-6 h-6 text-emerald-600" />
                       </div>
-                      {/* Addresses */}
-                      <div className="flex-1 space-y-4">
-                        <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-100">
-                          <p className="text-xs font-semibold text-emerald-600 uppercase mb-1">
-                            Pickup Location
+                      <div>
+                        <p className="font-semibold text-gray-900">
+                          {ride.customer.name}
+                        </p>
+                        <div className="flex items-center gap-1 text-sm text-gray-500">
+                          <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
+                          <span>{ride.customer.rating.toFixed(1)}</span>
+                          <span className="text-gray-400">
+                            • {ride.customer.totalRides} rides
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3 space-y-1">
+                      <InfoRow
+                        label="Customer ID"
+                        value={ride.customer.id}
+                        mono
+                      />
+                      <InfoRow label="Phone" value={ride.customer.phone} />
+                      <InfoRow label="Email" value={ride.customer.email} />
+                    </div>
+                  </div>
+
+                  {/* Driver Section */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                      Driver
+                    </h4>
+                    {ride.driver ? (
+                      <>
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                            <User className="w-6 h-6 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900">
+                              {ride.driver.name}
+                            </p>
+                            <div className="flex items-center gap-1 text-sm text-gray-500">
+                              <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
+                              <span>{ride.driver.rating.toFixed(1)}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-3 space-y-1">
+                          <InfoRow
+                            label="Driver ID"
+                            value={ride.driver.id}
+                            mono
+                          />
+                          <InfoRow label="Phone" value={ride.driver.phone} />
+                          <InfoRow label="Email" value={ride.driver.email} />
+                          <InfoRow
+                            label="Vehicle"
+                            value={ride.driver.vehicleModel}
+                          />
+                          <InfoRow
+                            label="Plate Number"
+                            value={ride.driver.vehicleNumber}
+                            mono
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
+                        <AlertCircle className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+                        <p className="text-sm font-medium text-amber-700">
+                          No Driver Assigned
+                        </p>
+                        <p className="text-xs text-amber-600">
+                          Waiting for driver acceptance
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Column */}
+                <div className="space-y-5">
+                  {/* Route Section */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                      Route
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex gap-3">
+                        <div className="flex flex-col items-center pt-1">
+                          <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                          <div className="w-0.5 h-full bg-gray-300 my-1 min-h-[40px]" />
+                        </div>
+                        <div className="flex-1 pb-2">
+                          <p className="text-xs font-semibold text-emerald-600 uppercase">
+                            Pickup
                           </p>
                           <p className="text-sm font-medium text-gray-900">
                             {ride.pickupAddress}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-gray-500">
                             {ride.pickupCity}, {ride.pickupState} -{" "}
                             {ride.pickupZip}
                           </p>
                         </div>
-                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                          <p className="text-xs font-semibold text-gray-600 uppercase mb-1">
-                            Drop Location
+                      </div>
+                      <div className="flex gap-3">
+                        <div className="flex flex-col items-center pt-1">
+                          <div className="w-3 h-3 rounded-full bg-gray-800" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs font-semibold text-gray-600 uppercase">
+                            Drop
                           </p>
                           <p className="text-sm font-medium text-gray-900">
                             {ride.dropAddress}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-gray-500">
                             {ride.dropCity}
                           </p>
                         </div>
                       </div>
-                      {/* Distance Info */}
-                      <div className="w-32 flex flex-col items-center justify-center bg-gray-50 rounded-lg p-4">
-                        <Route className="w-6 h-6 text-gray-400 mb-2" />
-                        <p className="text-xl font-bold text-gray-900">
-                          {ride.distance} km
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          ~ {ride.duration} min
-                        </p>
-                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Cancellation Reason if applicable */}
-                {ride.cancellationReason && (
-                  <div className="bg-gray-100 rounded-xl p-5 border border-gray-200">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center shrink-0">
-                        <XCircle className="w-5 h-5 text-gray-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-800">
-                          Cancellation Reason
-                        </p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {ride.cancellationReason}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === "timeline" && (
-              <div className="max-w-2xl mx-auto">
-                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                  <div className="bg-gray-100 px-5 py-3 border-b border-gray-200">
-                    <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-                      <Clock className="w-4 h-4" /> Ride Timeline
+                  {/* Ride Info Section */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                      Ride Information
                     </h4>
+                    <div className="bg-gray-50 rounded-lg p-3 space-y-1">
+                      <InfoRow label="Request ID" value={ride.id} mono />
+                      <InfoRow
+                        label="Ride Type"
+                        value={
+                          <Badge color="info">
+                            {RIDE_TYPE_LABELS[ride.rideType]}
+                          </Badge>
+                        }
+                      />
+                      <InfoRow label="Vehicle Type" value={ride.vehicleType} />
+                      <InfoRow
+                        label="Status"
+                        value={<RideStatusBadge status={ride.status} />}
+                      />
+                      <InfoRow
+                        label="Payment Status"
+                        value={
+                          <PaymentStatusBadge status={ride.paymentStatus} />
+                        }
+                      />
+                      <InfoRow
+                        label="Payment Method"
+                        value={ride.paymentMethod}
+                      />
+                    </div>
                   </div>
-                  <div className="p-6">
-                    <div className="relative pl-8">
-                      {/* Timeline line */}
-                      <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-gray-200" />
 
-                      {/* Request Time */}
-                      <div className="relative mb-8">
-                        <div className="absolute -left-8 top-0 w-6 h-6 rounded-full bg-gray-900 border-4 border-white shadow-sm flex items-center justify-center">
-                          <div className="w-2 h-2 bg-white rounded-full" />
-                        </div>
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <p className="text-xs font-semibold text-gray-500 uppercase">
-                            Request Created
+                  {/* Cancellation Reason */}
+                  {ride.cancellationReason && (
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                        Cancellation
+                      </h4>
+                      <div className="bg-gray-100 rounded-lg p-3">
+                        <div className="flex items-start gap-2">
+                          <XCircle className="w-4 h-4 text-gray-600 mt-0.5" />
+                          <p className="text-sm text-gray-700">
+                            {ride.cancellationReason}
                           </p>
-                          <p className="text-sm font-medium text-gray-900 mt-1">
-                            {formatDateTime(ride.requestDate)}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Ride request submitted by customer
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Accepted Time */}
-                      <div className="relative mb-8">
-                        <div
-                          className={`absolute -left-8 top-0 w-6 h-6 rounded-full border-4 border-white shadow-sm flex items-center justify-center ${
-                            ride.acceptedDate ? "bg-blue-500" : "bg-gray-300"
-                          }`}
-                        >
-                          <div className="w-2 h-2 bg-white rounded-full" />
-                        </div>
-                        <div
-                          className={`rounded-lg p-4 ${
-                            ride.acceptedDate ? "bg-blue-50" : "bg-gray-50"
-                          }`}
-                        >
-                          <p className="text-xs font-semibold text-gray-500 uppercase">
-                            Driver Accepted
-                          </p>
-                          {ride.acceptedDate ? (
-                            <>
-                              <p className="text-sm font-medium text-gray-900 mt-1">
-                                {formatDateTime(ride.acceptedDate)}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-1">
-                                Driver {ride.driver?.name || "N/A"} accepted the
-                                ride
-                              </p>
-                            </>
-                          ) : (
-                            <p className="text-sm text-gray-400 mt-1">
-                              Waiting for driver...
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Pickup Time */}
-                      <div className="relative mb-8">
-                        <div
-                          className={`absolute -left-8 top-0 w-6 h-6 rounded-full border-4 border-white shadow-sm flex items-center justify-center ${
-                            ride.pickupTime ? "bg-emerald-500" : "bg-gray-300"
-                          }`}
-                        >
-                          <div className="w-2 h-2 bg-white rounded-full" />
-                        </div>
-                        <div
-                          className={`rounded-lg p-4 ${
-                            ride.pickupTime ? "bg-emerald-50" : "bg-gray-50"
-                          }`}
-                        >
-                          <p className="text-xs font-semibold text-gray-500 uppercase">
-                            Driver Arrived / Pickup
-                          </p>
-                          {ride.pickupTime ? (
-                            <>
-                              <p className="text-sm font-medium text-gray-900 mt-1">
-                                {formatDateTime(ride.pickupTime)}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-1">
-                                Customer picked up at location
-                              </p>
-                            </>
-                          ) : (
-                            <p className="text-sm text-gray-400 mt-1">—</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Ride Started */}
-                      <div className="relative mb-8">
-                        <div
-                          className={`absolute -left-8 top-0 w-6 h-6 rounded-full border-4 border-white shadow-sm flex items-center justify-center ${
-                            ride.startRideDate ? "bg-indigo-500" : "bg-gray-300"
-                          }`}
-                        >
-                          <div className="w-2 h-2 bg-white rounded-full" />
-                        </div>
-                        <div
-                          className={`rounded-lg p-4 ${
-                            ride.startRideDate ? "bg-indigo-50" : "bg-gray-50"
-                          }`}
-                        >
-                          <p className="text-xs font-semibold text-gray-500 uppercase">
-                            Ride Started
-                          </p>
-                          {ride.startRideDate ? (
-                            <>
-                              <p className="text-sm font-medium text-gray-900 mt-1">
-                                {formatDateTime(ride.startRideDate)}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-1">
-                                Journey to destination began
-                              </p>
-                            </>
-                          ) : (
-                            <p className="text-sm text-gray-400 mt-1">—</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Completed */}
-                      <div className="relative">
-                        <div
-                          className={`absolute -left-8 top-0 w-6 h-6 rounded-full border-4 border-white shadow-sm flex items-center justify-center ${
-                            ride.completedDate
-                              ? "bg-emerald-600"
-                              : "bg-gray-300"
-                          }`}
-                        >
-                          {ride.completedDate ? (
-                            <CheckCircle className="w-3 h-3 text-white" />
-                          ) : (
-                            <div className="w-2 h-2 bg-white rounded-full" />
-                          )}
-                        </div>
-                        <div
-                          className={`rounded-lg p-4 ${
-                            ride.completedDate ? "bg-emerald-50" : "bg-gray-50"
-                          }`}
-                        >
-                          <p className="text-xs font-semibold text-gray-500 uppercase">
-                            Ride Completed
-                          </p>
-                          {ride.completedDate ? (
-                            <>
-                              <p className="text-sm font-medium text-gray-900 mt-1">
-                                {formatDateTime(ride.completedDate)}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-1">
-                                Ride completed successfully
-                              </p>
-                            </>
-                          ) : (
-                            <p className="text-sm text-gray-400 mt-1">—</p>
-                          )}
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* Notes */}
+                  {ride.notes && (
+                    <div>
+                      <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                        Notes
+                      </h4>
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-sm text-gray-700">{ride.notes}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {activeTab === "payment" && (
-              <div className="max-w-3xl mx-auto space-y-6">
-                {/* Payment Summary */}
-                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                  <div className="bg-emerald-600 px-5 py-4">
-                    <h4 className="text-lg font-semibold text-white flex items-center gap-2">
-                      <Wallet className="w-5 h-5" /> Payment Summary
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Left - Payment Info */}
+                <div className="space-y-2">
+                  {/* Payment Summary */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                      Payment Summary
                     </h4>
-                  </div>
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-100">
-                      <div>
-                        <p className="text-sm text-gray-500">Total Amount</p>
-                        <p className="text-4xl font-bold text-gray-900">
-                          ₹{ride.fare}
-                        </p>
+                    <div className="bg-gray-900 rounded-xl p-2 text-white">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-gray-400">Total Amount</span>
+                        <PaymentStatusBadge status={ride.paymentStatus} />
                       </div>
-                      <PaymentStatusBadge status={ride.paymentStatus} />
+                      <p className="text-4xl font-bold">₹{ride.fare}</p>
                     </div>
+                  </div>
 
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <CreditCard className="w-5 h-5 text-gray-400" />
-                          <span className="text-sm text-gray-600">
-                            Payment Method
-                          </span>
-                        </div>
-                        <span className="text-sm font-semibold text-gray-900">
-                          {ride.paymentMethod}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <FileText className="w-5 h-5 text-gray-400" />
-                          <span className="text-sm text-gray-600">
-                            Transaction ID
-                          </span>
-                        </div>
-                        <span className="text-sm font-mono font-semibold text-gray-900">
-                          TXN-{ride.id.replace("RID-", "")}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Calendar className="w-5 h-5 text-gray-400" />
-                          <span className="text-sm text-gray-600">
-                            Payment Date
-                          </span>
-                        </div>
-                        <span className="text-sm font-medium text-gray-900">
-                          {ride.paymentStatus === "PAID" && ride.completedDate
+                  {/* Payment Details */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                      Payment Details
+                    </h4>
+                    <div className="bg-gray-50 rounded-lg p-3 space-y-1">
+                      <InfoRow
+                        label="Payment Method"
+                        value={ride.paymentMethod}
+                      />
+                      <InfoRow
+                        label="Transaction ID"
+                        value={`TXN-${ride.id.replace("RR-", "")}`}
+                        mono
+                      />
+                      <InfoRow
+                        label="Payment Date"
+                        value={
+                          ride.paymentStatus === "PAID" && ride.completedDate
                             ? formatDate(ride.completedDate)
-                            : "—"}
+                            : "—"
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  {/* Fare Breakdown */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                      Fare Breakdown
+                    </h4>
+                    <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Base Fare</span>
+                        <span className="text-gray-900">
+                          ₹{Math.round(ride.fare * 0.4)}
                         </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">
+                          Distance ({ride.distance} km × ₹12)
+                        </span>
+                        <span className="text-gray-900">
+                          ₹{Math.round(ride.fare * 0.45)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">
+                          Time ({ride.duration} min × ₹2)
+                        </span>
+                        <span className="text-gray-900">
+                          ₹{Math.round(ride.fare * 0.1)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Platform Fee</span>
+                        <span className="text-gray-900">
+                          ₹{Math.round(ride.fare * 0.05)}
+                        </span>
+                      </div>
+                      <div className="border-t border-gray-200 pt-2 mt-2">
+                        <div className="flex justify-between font-semibold">
+                          <span className="text-gray-900">Total</span>
+                          <span className="text-gray-900">₹{ride.fare}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Fare Breakdown */}
-                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                  <div className="bg-gray-100 px-5 py-3 border-b border-gray-200">
-                    <h4 className="text-sm font-semibold text-gray-800">
-                      Fare Breakdown
-                    </h4>
-                  </div>
-                  <div className="p-5 space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Base Fare</span>
-                      <span className="text-gray-900">
-                        ₹{Math.round(ride.fare * 0.4)}
-                      </span>
+                {/* Right - Timeline */}
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                    Ride Timeline
+                  </h4>
+                  <div className="relative pl-6">
+                    {/* Timeline Items */}
+                    <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-gray-200" />
+
+                    {/* Request Created */}
+                    <div className="relative mb-5">
+                      <div className="absolute -left-6 top-1 w-4 h-4 rounded-full bg-gray-900 border-2 border-white" />
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase">
+                          Request Created
+                        </p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {formatDateTime(ride.requestDate)}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Ride request submitted
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">
-                        Distance ({ride.distance} km × ₹12/km)
-                      </span>
-                      <span className="text-gray-900">
-                        ₹{Math.round(ride.fare * 0.45)}
-                      </span>
+
+                    {/* Driver Accepted */}
+                    <div className="relative mb-5">
+                      <div
+                        className={`absolute -left-6 top-1 w-4 h-4 rounded-full border-2 border-white ${
+                          ride.acceptedDate ? "bg-blue-500" : "bg-gray-300"
+                        }`}
+                      />
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase">
+                          Driver Accepted
+                        </p>
+                        {ride.acceptedDate ? (
+                          <>
+                            <p className="text-sm font-medium text-gray-900">
+                              {formatDateTime(ride.acceptedDate)}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {ride.driver?.name} accepted
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-sm text-gray-400">Waiting...</p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">
-                        Time ({ride.duration} min × ₹2/min)
-                      </span>
-                      <span className="text-gray-900">
-                        ₹{Math.round(ride.fare * 0.1)}
-                      </span>
+
+                    {/* Pickup */}
+                    <div className="relative mb-5">
+                      <div
+                        className={`absolute -left-6 top-1 w-4 h-4 rounded-full border-2 border-white ${
+                          ride.pickupTime ? "bg-emerald-500" : "bg-gray-300"
+                        }`}
+                      />
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase">
+                          Pickup
+                        </p>
+                        {ride.pickupTime ? (
+                          <>
+                            <p className="text-sm font-medium text-gray-900">
+                              {formatDateTime(ride.pickupTime)}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Customer picked up
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-sm text-gray-400">—</p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Platform Fee</span>
-                      <span className="text-gray-900">
-                        ₹{Math.round(ride.fare * 0.05)}
-                      </span>
+
+                    {/* Ride Started */}
+                    <div className="relative mb-5">
+                      <div
+                        className={`absolute -left-6 top-1 w-4 h-4 rounded-full border-2 border-white ${
+                          ride.startRideDate ? "bg-indigo-500" : "bg-gray-300"
+                        }`}
+                      />
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase">
+                          Ride Started
+                        </p>
+                        {ride.startRideDate ? (
+                          <>
+                            <p className="text-sm font-medium text-gray-900">
+                              {formatDateTime(ride.startRideDate)}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Journey began
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-sm text-gray-400">—</p>
+                        )}
+                      </div>
                     </div>
-                    <div className="border-t border-gray-200 pt-3 mt-3">
-                      <div className="flex justify-between text-base font-semibold">
-                        <span className="text-gray-900">Total</span>
-                        <span className="text-gray-900">₹{ride.fare}</span>
+
+                    {/* Completed */}
+                    <div className="relative">
+                      <div
+                        className={`absolute -left-6 top-1 w-4 h-4 rounded-full border-2 border-white ${
+                          ride.completedDate ? "bg-emerald-600" : "bg-gray-300"
+                        }`}
+                      />
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase">
+                          Completed
+                        </p>
+                        {ride.completedDate ? (
+                          <>
+                            <p className="text-sm font-medium text-gray-900">
+                              {formatDateTime(ride.completedDate)}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Ride completed
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-sm text-gray-400">—</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1640,21 +1517,16 @@ const ViewDetailModal: React.FC<{
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl shrink-0">
-            <p className="text-xs text-gray-500">
-              Last updated: {formatDateTime(ride.requestDate)}
-            </p>
-            <div className="flex items-center gap-3">
-              <Button variant="outline" onClick={onClose}>
-                Close
-              </Button>
-              <Button variant="outline">
-                <MessageSquare className="w-4 h-4" /> Contact
-              </Button>
-              <Button>
-                <FileText className="w-4 h-4" /> Download Receipt
-              </Button>
-            </div>
+          <div className="flex items-center justify-end px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl shrink-0 gap-3">
+            <Button variant="outline" onClick={onClose}>
+              Close
+            </Button>
+            <Button variant="outline">
+              <MessageSquare className="w-4 h-4" /> Contact
+            </Button>
+            <Button>
+              <FileText className="w-4 h-4" /> Download Receipt
+            </Button>
           </div>
         </div>
       </div>
@@ -1706,9 +1578,9 @@ const UpdateRideModal: React.FC<{
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="relative w-full max-w-2xl transform rounded-2xl bg-white shadow-2xl">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-900 rounded-t-2xl">
+          <div className="flex items-center justify-between px-6 py-2 border-b border-gray-100 bg-gray-900 rounded-t-2xl">
             <div>
-              <h3 className="text-lg font-bold text-white">
+              <h3 className="text-base font-normal text-white">
                 Update Ride Request
               </h3>
               <p className="text-gray-400 text-sm">ID: {ride.id}</p>
@@ -2182,18 +2054,17 @@ const RideRequestAdminPage: React.FC = () => {
               placeholder="Search by customer name, email, phone, request ID, or address..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full h-11 pl-10 pr-4 text-sm bg-white border-2 border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-colors placeholder:text-gray-400"
+              className="w-full h-11 pl-10 pr-4 text-sm bg-white border-2 border-gray-300 rounded-lg focus:border-black focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-colors placeholder:text-gray-400"
             />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
+              <label className="block text-xs font-semibold text-gray-900 mb-1">
                 Status
               </label>
               <Select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="h-9 text-sm"
               >
                 <option value="">All Status</option>
                 <option value="PENDING">Pending</option>
@@ -2205,13 +2076,12 @@ const RideRequestAdminPage: React.FC = () => {
               </Select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
+              <label className="block text-xs font-semibold text-gray-900 mb-1">
                 Payment
               </label>
               <Select
                 value={paymentStatusFilter}
                 onChange={(e) => setPaymentStatusFilter(e.target.value)}
-                className="h-9 text-sm"
               >
                 <option value="">All Payment</option>
                 <option value="PENDING">Pending</option>
@@ -2221,13 +2091,12 @@ const RideRequestAdminPage: React.FC = () => {
               </Select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
+              <label className="block text-xs font-semibold text-gray-900 mb-1">
                 Ride Type
               </label>
               <Select
                 value={rideTypeFilter}
                 onChange={(e) => setRideTypeFilter(e.target.value)}
-                className="h-9 text-sm"
               >
                 <option value="">All Types</option>
                 <option value="IMMEDIATE">Immediate</option>
@@ -2243,7 +2112,7 @@ const RideRequestAdminPage: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={handleClearFilters}
-                className="h-9 w-full text-sm gap-1"
+                className="h-11 w-full text-sm gap-1 border-2 border-gray-300 hover:bg-gray-50 text-gray-700"
               >
                 <RotateCcw className="w-3.5 h-3.5" /> Reset
               </Button>
@@ -2251,7 +2120,7 @@ const RideRequestAdminPage: React.FC = () => {
             <div className="flex items-end">
               <Button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="h-9 w-full text-sm"
+                className="h-11 w-full p-1 text-sm  text-white border-2 border-transparent"
               >
                 <Plus className="w-4 h-4" /> Create ride request
               </Button>
@@ -2262,14 +2131,14 @@ const RideRequestAdminPage: React.FC = () => {
 
       {/* Table */}
       <Card>
-        <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-800">
+        <div className="p-2 w-full">
+          <h2 className="text-lg font-normal text-white bg-[#2F3A3F] rounded p-1">
             Ride requests list
           </h2>
-          <span className="text-sm text-gray-500">
-            {filteredRides.length} total
-          </span>
         </div>
+        <span className="text-sm text-black">
+          {filteredRides.length} total Ride Requests
+        </span>
 
         <div className="overflow-x-auto">
           <table className="min-w-full">
@@ -2294,7 +2163,7 @@ const RideRequestAdminPage: React.FC = () => {
                   Pickup Time
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-700  w-24">
-                  Type
+                  Ride Type
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-700  w-32">
                   Status
@@ -2422,17 +2291,18 @@ const RideRequestAdminPage: React.FC = () => {
                           View Detail
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => openUpdateModal(ride)}
-                          icon={<Edit className="h-4 w-4 text-blue-600" />}
-                        >
-                          Update
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
                           onClick={() => openDriverResponseLog(ride)}
                           icon={<Truck className="h-4 w-4 text-gray-500" />}
                         >
                           Driver Response
                         </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => openUpdateModal(ride)}
+                          icon={<Edit className="h-4 w-4 text-blue-600" />}
+                        >
+                          Edit
+                        </DropdownMenuItem>
+
                         <DropdownMenuItem
                           onClick={() => handleDeleteRide(ride.id)}
                           icon={<Trash2 className="h-4 w-4 text-red-500" />}

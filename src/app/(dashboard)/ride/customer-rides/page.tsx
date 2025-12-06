@@ -1,5 +1,11 @@
 "use client";
-import React, { useState, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
 import {
   MoreVertical,
   ChevronDown,
@@ -16,6 +22,7 @@ import {
   Search,
   Filter,
   Users,
+  Eye,
 } from "lucide-react";
 
 // --- BRAND COLOR & CONSTANTS ---
@@ -185,70 +192,125 @@ const ActionMenu: React.FC<{
   onAction: (action: string) => void;
 }> = ({ ride, onAction }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const isCompleted = ride.tripStatus === "Trip Completed";
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
-    <div className="relative inline-block text-left">
+    <div ref={menuRef} className="relative inline-block text-left">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+        className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-150"
         aria-expanded={isOpen}
       >
-        <MoreVertical className="w-5 h-5 text-gray-600" />
+        <MoreVertical className="w-4 h-4 text-gray-700" />
       </button>
 
       {isOpen && (
-        <div
-          className="absolute right-0 z-50 w-48 mt-2 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-          role="menu"
-          aria-orientation="vertical"
-        >
-          <div className="py-1">
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                onAction("viewDetail");
-              }}
-              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              role="menuitem"
-            >
-              <Users className="w-4 h-4 mr-2" />
-              View Detail
-            </button>
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                onAction("transactionHistory");
-              }}
-              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              role="menuitem"
-            >
-              <DollarSign className="w-4 h-4 mr-2" />
-              Transaction History
-            </button>
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                onAction("invoke");
-              }}
-              disabled={!isCompleted}
-              className={`flex items-center w-full px-4 py-2 text-sm ${
-                isCompleted
-                  ? "text-green-700 hover:bg-green-50"
-                  : "text-gray-400 cursor-not-allowed"
-              }`}
-              role="menuitem"
-              title={
-                !isCompleted
-                  ? "Invoke is only available for completed trips"
-                  : "Download ride data"
-              }
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Invoke (Download)
-            </button>
+        <>
+          {/* Backdrop for mobile */}
+          <div
+            className="fixed inset-0 z-40 md:hidden"
+            onClick={() => setIsOpen(false)}
+          />
+
+          {/* Dropdown Menu */}
+          <div
+            className="absolute right-0 z-50 w-45 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150"
+            role="menu"
+            aria-orientation="vertical"
+          >
+            <div className="p-1">
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  onAction("viewDetail");
+                }}
+                className="flex items-center w-full px-3 py-2.5 text-sm text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
+                role="menuitem"
+              >
+                <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center mr-3">
+                  <Eye className="w-4 h-4 text-blue-600" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-sm">View Detail</p>
+                  {/* <p className="text-xs text-gray-500">See full ride info</p> */}
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  onAction("transactionHistory");
+                }}
+                className="flex items-center w-full px-3 py-2.5 text-sm text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
+                role="menuitem"
+              >
+                <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center mr-3">
+                  <DollarSign className="w-4 h-4 text-emerald-600" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-sm">Transaction</p>
+                  {/* <p className="text-xs text-gray-500">Payment history</p> */}
+                </div>
+              </button>
+
+              <div className="h-px bg-gray-100 my-1" />
+
+              <button
+                onClick={() => {
+                  if (isCompleted) {
+                    setIsOpen(false);
+                    onAction("invoke");
+                  }
+                }}
+                disabled={!isCompleted}
+                className={`flex items-center w-full px-3 py-2.5 text-sm rounded-md transition-colors ${
+                  isCompleted
+                    ? "text-gray-700 hover:bg-gray-100"
+                    : "text-gray-400 cursor-not-allowed opacity-50"
+                }`}
+                role="menuitem"
+                title={
+                  !isCompleted ? "Only for completed trips" : "Download CSV"
+                }
+              >
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
+                    isCompleted ? "bg-gray-100" : "bg-gray-50"
+                  }`}
+                >
+                  <Download
+                    className={`w-4 h-4 ${
+                      isCompleted ? "text-gray-600" : "text-gray-400"
+                    }`}
+                  />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-sm">Download</p>
+                  <p className="text-xs text-gray-500">
+                    {isCompleted ? "Export as CSV" : "Completed only"}
+                  </p>
+                </div>
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
@@ -258,25 +320,28 @@ const ActionMenu: React.FC<{
  * Status Badge for the table
  */
 const StatusBadge: React.FC<{ status: Ride["tripStatus"] }> = ({ status }) => {
-  let colorClass = "bg-gray-200 text-gray-800";
-  if (status === "Trip Completed") {
-    colorClass = "bg-green-100 text-green-700 border border-green-300";
-  } else if (status.startsWith("Cancelled")) {
-    colorClass = "bg-red-100 text-red-700 border border-red-300";
-  } else if (status === "Trip Started") {
-    colorClass = "bg-yellow-100 text-yellow-700 border border-yellow-300";
-  }
+  let colorClass = "bg-gray-500/10 text-gray-600";
+  let displayText: string = status;
 
-  const tooltipText = status.startsWith("Cancelled")
-    ? status.split(": ")[1] || status
-    : status;
+  if (status === "Trip Completed") {
+    colorClass = "bg-emerald-500/15 text-emerald-700";
+    displayText = "Completed";
+  } else if (status === "Trip Started") {
+    colorClass = "bg-blue-500/15 text-blue-700";
+    displayText = "In Progress";
+  } else if (status === "Cancelled by rider") {
+    colorClass = "bg-orange-500/15 text-orange-700";
+    displayText = "Cancelled";
+  } else if (status === "Cancelled by driver") {
+    colorClass = "bg-red-500/15 text-red-700";
+    displayText = "Cancelled";
+  }
 
   return (
     <span
-      className={`px-3 py-1 text-xs font-medium rounded-full ${colorClass} truncate max-w-[150px]`}
-      title={tooltipText}
+      className={`px-2 py-0.5 text-[11px] font-medium rounded ${colorClass}`}
     >
-      {status.split(" ")[0]}
+      {displayText}
     </span>
   );
 };
@@ -284,7 +349,7 @@ const StatusBadge: React.FC<{ status: Ride["tripStatus"] }> = ({ status }) => {
 // --- MODALS AND DRAWERS ---
 
 /**
- * 2. Ride Details Modal/Pop-up (Second Screenshot)
+ * Ride Details Modal - Compact & Organized UI
  */
 const RideDetailsModal: React.FC<{
   ride: Ride | null;
@@ -294,204 +359,309 @@ const RideDetailsModal: React.FC<{
 
   const { detailData } = ride;
 
-  const DetailItem: React.FC<{
-    label: string;
-    value: string | number;
-    icon: React.ReactNode;
-  }> = ({ label, value, icon }) => (
-    <div className="flex items-center space-x-2 text-gray-700">
-      {icon}
-      <div>
-        <div className="text-xs font-medium text-gray-500">{label}</div>
-        <div className="text-sm font-semibold">{value}</div>
-      </div>
-    </div>
-  );
+  const getStatusInfo = (status: string) => {
+    if (status === "Trip Completed")
+      return {
+        text: "Completed",
+        color: "text-emerald-600",
+        bg: "bg-emerald-100",
+      };
+    if (status === "Trip Started")
+      return { text: "In Progress", color: "text-blue-600", bg: "bg-blue-100" };
+    if (status === "Cancelled by rider")
+      return {
+        text: "Rider Cancelled",
+        color: "text-orange-600",
+        bg: "bg-orange-100",
+      };
+    if (status === "Cancelled by driver")
+      return {
+        text: "Driver Cancelled",
+        color: "text-red-600",
+        bg: "bg-red-100",
+      };
+    return { text: status, color: "text-gray-600", bg: "bg-gray-100" };
+  };
+
+  const statusInfo = getStatusInfo(ride.tripStatus);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
-      <div className="w-full max-w-4xl max-h-[90vh] bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-3xl max-h-[90vh] bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b">
-          <h2 className="text-xl font-bold flex items-center text-gray-800">
-            <ArrowLeft
-              className="w-5 h-5 mr-3 text-gray-500 cursor-pointer hover:text-gray-700"
-              onClick={onClose}
-            />
-            Ride Details (ID: {ride.id})
-          </h2>
+        <div className="bg-gray-900 text-white px-5 py-3 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-3">
+            <h3 className="text-base font-bold">Ride Details</h3>
+            <span className="text-gray-400 font-mono text-sm">#{ride.id}</span>
+            <span
+              className={`px-2 py-0.5 text-xs font-semibold rounded-full ${statusInfo.bg} ${statusInfo.color}`}
+            >
+              {statusInfo.text}
+            </span>
+          </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 text-gray-500"
+            className="p-1.5 hover:bg-white/10 rounded-lg"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Content Body */}
-        <div className="flex-grow p-6 overflow-y-auto space-y-8">
-          {/* Ride Route Map */}
-          <section>
-            <h3 className="mb-4 text-lg font-semibold text-gray-800 flex items-center">
-              <Map className="w-5 h-5 mr-2 text-emerald-600" /> Ride Route Map
-            </h3>
-            <div className="h-64 overflow-hidden border border-gray-200 rounded-lg bg-gray-100 flex items-center justify-center">
-              {/* Placeholder for the map image */}
-              <img
-                src="https://placehold.co/800x400/E5F7ED/10B981?text=Map+Placeholder"
-                alt="Ride route map"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src =
-                    "https://placehold.co/800x400/E5F7ED/10B981?text=Map+Unavailable";
-                }}
-              />
+        {/* Content */}
+        <div className="p-4 overflow-y-auto flex-1">
+          {/* Quick Stats */}
+          <div className="grid grid-cols-4 gap-2 mb-4">
+            <div className="text-center py-2 px-3 bg-gray-50 rounded-lg">
+              <p className="text-lg font-bold text-gray-900">
+                {detailData.rideDetails.distanceKm}
+              </p>
+              <p className="text-[10px] text-gray-500 uppercase">km</p>
             </div>
-          </section>
-
-          {/* Information Section */}
-          <div className="grid gap-8 sm:grid-cols-3">
-            {/* Rider Information */}
-            <InfoCard
-              title="Rider Information"
-              icon={<User className="w-5 h-5 text-blue-500" />}
-            >
-              <DetailItem
-                label="Rider Name"
-                value={detailData.riderInfo.name}
-                icon={<User className="w-4 h-4 text-blue-400" />}
-              />
-              <DetailItem
-                label="Rider Phone"
-                value={detailData.riderInfo.phone}
-                icon={<Phone className="w-4 h-4 text-blue-400" />}
-              />
-              <DetailItem
-                label="Is Rental"
-                value={detailData.riderInfo.isRental}
-                icon={<Car className="w-4 h-4 text-blue-400" />}
-              />
-            </InfoCard>
-
-            {/* Driver Information */}
-            <InfoCard
-              title="Driver Information"
-              icon={<Car className="w-5 h-5 text-orange-500" />}
-            >
-              <DetailItem
-                label="Driver Name"
-                value={detailData.driverInfo.name}
-                icon={<User className="w-4 h-4 text-orange-400" />}
-              />
-              <DetailItem
-                label="Driver Phone"
-                value={detailData.driverInfo.phone}
-                icon={<Phone className="w-4 h-4 text-orange-400" />}
-              />
-            </InfoCard>
-
-            {/* Vehicle Information */}
-            <InfoCard
-              title="Vehicle Information"
-              icon={<Car className="w-5 h-5 text-purple-500" />}
-            >
-              <DetailItem
-                label="Number"
-                value={detailData.vehicleInfo.number}
-                icon={<Car className="w-4 h-4 text-purple-400" />}
-              />
-              <DetailItem
-                label="Make Model"
-                value={detailData.vehicleInfo.makeModel}
-                icon={<Car className="w-4 h-4 text-purple-400" />}
-              />
-              <DetailItem
-                label="Vehicle Type"
-                value={detailData.vehicleInfo.vehicleType}
-                icon={<Car className="w-4 h-4 text-purple-400" />}
-              />
-            </InfoCard>
+            <div className="text-center py-2 px-3 bg-gray-50 rounded-lg">
+              <p className="text-lg font-bold text-gray-900">
+                {detailData.rideDetails.timeMinutes}
+              </p>
+              <p className="text-[10px] text-gray-500 uppercase">min</p>
+            </div>
+            <div className="text-center py-2 px-3 bg-gray-50 rounded-lg">
+              <p className="text-lg font-bold text-gray-900">
+                ${detailData.fareSummary.totalBill}
+              </p>
+              <p className="text-[10px] text-gray-500 uppercase">fare</p>
+            </div>
+            <div className="text-center py-2 px-3 bg-gray-50 rounded-lg">
+              <p className="text-lg font-bold text-gray-900">{ride.type}</p>
+              <p className="text-[10px] text-gray-500 uppercase">type</p>
+            </div>
           </div>
 
-          {/* Ride Details & Fare Summary */}
-          <div className="grid gap-8 lg:grid-cols-2">
-            <section>
-              <h3 className="mb-4 text-lg font-semibold text-gray-800 flex items-center">
-                <Clock className="w-5 h-5 mr-2 text-emerald-600" /> Ride Details
-              </h3>
-              <div className="p-4 space-y-3 bg-white border border-gray-200 rounded-lg shadow-sm">
-                <DetailRow
-                  label="Status"
-                  value={
-                    <StatusBadge
-                      status={
-                        detailData.rideDetails.status as Ride["tripStatus"]
-                      }
-                    />
-                  }
-                />
-                <DetailRow
-                  label="Start Time"
-                  value={detailData.rideDetails.startTime}
-                  icon={<Calendar />}
-                />
-                <DetailRow
-                  label="End Time"
-                  value={detailData.rideDetails.endTime}
-                  icon={<Calendar />}
-                />
-                <DetailRow
-                  label="Starting From"
-                  value={detailData.rideDetails.starting}
-                  icon={<Map />}
-                />
-                <DetailRow
-                  label="Ended At"
-                  value={detailData.rideDetails.endedAt}
-                  icon={<Map />}
-                />
-                <DetailRow
-                  label="Time (Minutes)"
-                  value={`${detailData.rideDetails.timeMinutes} Min`}
-                  icon={<Clock />}
-                />
-                <DetailRow
-                  label="Distance (Km)"
-                  value={`${detailData.rideDetails.distanceKm} Km`}
-                  icon={<Map />}
-                />
-                <DetailRow
-                  label="Coupon"
-                  value={detailData.rideDetails.coupon}
-                  icon={<DollarSign />}
-                />
-              </div>
-            </section>
-
-            <section>
-              <h3 className="mb-4 text-lg font-semibold text-gray-800 flex items-center">
-                <DollarSign className="w-5 h-5 mr-2 text-emerald-600" /> Fare
-                Summary
-              </h3>
-              <div className="p-4 space-y-3 bg-white border border-gray-200 rounded-lg shadow-sm">
-                <DetailRow
-                  label="Net Ride Fare"
-                  value={`$${detailData.fareSummary.netRideFare}`}
-                />
-                <DetailRow
-                  label="Total Bill"
-                  value={`$${detailData.fareSummary.totalBill}`}
-                />
-                <div className="pt-3 mt-3 border-t">
-                  <DetailRow
-                    label="Final Amount Paid"
-                    value={`$${detailData.fareSummary.totalBill}`}
-                  />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Left Column */}
+            <div className="space-y-3">
+              {/* Rider & Driver */}
+              <div className="bg-gray-50 rounded-lg p-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">
+                      Rider
+                    </p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {detailData.riderInfo.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {detailData.riderInfo.phone}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">
+                      Driver
+                    </p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {detailData.driverInfo.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {detailData.driverInfo.phone}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </section>
+
+              {/* Vehicle */}
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">
+                  Vehicle
+                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {detailData.vehicleInfo.makeModel}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {detailData.vehicleInfo.vehicleType}
+                    </p>
+                  </div>
+                  <span className="px-2 py-1 bg-gray-200 rounded text-xs font-mono font-bold text-gray-700">
+                    {detailData.vehicleInfo.number}
+                  </span>
+                </div>
+              </div>
+
+              {/* Route */}
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase mb-2">
+                  Route
+                </p>
+                <div className="flex gap-2">
+                  <div className="flex flex-col items-center">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <div className="w-0.5 flex-1 bg-gray-300 my-1" />
+                    <div className="w-2 h-2 rounded-full bg-gray-800" />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <div>
+                      <p className="text-xs text-gray-900">
+                        {detailData.rideDetails.starting}
+                      </p>
+                      <p className="text-[10px] text-gray-500">
+                        {detailData.rideDetails.startTime}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-900">
+                        {detailData.rideDetails.endedAt !== "~NA~"
+                          ? detailData.rideDetails.endedAt
+                          : "In Progress..."}
+                      </p>
+                      <p className="text-[10px] text-gray-500">
+                        {detailData.rideDetails.endTime !== "~NA~"
+                          ? detailData.rideDetails.endTime
+                          : "—"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Booking Info */}
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">
+                  Booking Info
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">ID:</span>
+                    <span className="font-medium text-gray-900">
+                      {ride.bookingId}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Booked:</span>
+                    <span className="font-medium text-gray-900">
+                      {ride.bookedDate}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-3">
+              {/* Real-Time Status */}
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase mb-2">
+                  Status Timeline
+                </p>
+                <div className="space-y-2">
+                  {[
+                    {
+                      label: "Booked",
+                      value: `${ride.bookedDate} ${ride.bookedTime}`,
+                      active: true,
+                    },
+                    {
+                      label: "Driver Assigned",
+                      value: detailData.driverInfo.name,
+                      active:
+                        ride.tripStatus === "Trip Started" ||
+                        ride.tripStatus === "Trip Completed" ||
+                        ride.tripStatus.startsWith("Cancelled"),
+                    },
+                    {
+                      label: "Pickup",
+                      value:
+                        ride.tripStatus === "Trip Started" ||
+                        ride.tripStatus === "Trip Completed"
+                          ? "Picked Up"
+                          : "Waiting",
+                      active:
+                        ride.tripStatus === "Trip Started" ||
+                        ride.tripStatus === "Trip Completed",
+                    },
+                    {
+                      label: "En Route",
+                      value:
+                        ride.tripStatus === "Trip Started"
+                          ? "In Transit"
+                          : ride.tripStatus === "Trip Completed"
+                          ? "Completed"
+                          : "—",
+                      active:
+                        ride.tripStatus === "Trip Started" ||
+                        ride.tripStatus === "Trip Completed",
+                      pulse: ride.tripStatus === "Trip Started",
+                    },
+                    {
+                      label: "Dropoff",
+                      value:
+                        ride.tripStatus === "Trip Completed" ? "Arrived" : "—",
+                      active: ride.tripStatus === "Trip Completed",
+                    },
+                  ].map((step, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          step.active
+                            ? step.pulse
+                              ? "bg-blue-500 animate-pulse"
+                              : "bg-emerald-500"
+                            : "bg-gray-300"
+                        }`}
+                      />
+                      <span className="text-[10px] font-semibold text-gray-500 uppercase w-24">
+                        {step.label}
+                      </span>
+                      <span className="text-xs text-gray-900 flex-1 truncate">
+                        {step.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fare Summary */}
+              <div className="bg-gray-900 text-white rounded-lg p-3">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase mb-2">
+                  Fare Summary
+                </p>
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Net Ride Fare</span>
+                    <span className="font-medium">
+                      ${detailData.fareSummary.netRideFare}
+                    </span>
+                  </div>
+                  {detailData.rideDetails.coupon !== "~NA~" && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">
+                        Coupon ({detailData.rideDetails.coupon})
+                      </span>
+                      <span className="font-medium text-emerald-400">
+                        -$5.00
+                      </span>
+                    </div>
+                  )}
+                  <div className="border-t border-gray-700 pt-1.5 mt-1.5">
+                    <div className="flex justify-between">
+                      <span className="font-semibold">Total</span>
+                      <span className="text-base font-bold">
+                        ${detailData.fareSummary.totalBill}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-4 py-3 border-t border-gray-200 bg-gray-50 flex justify-end shrink-0">
+          <button
+            onClick={onClose}
+            className="px-4 py-1.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800"
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>
@@ -549,7 +719,7 @@ const TransactionHistoryDrawer: React.FC<{
     <div className="fixed inset-0 z-50">
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black bg-opacity-50"
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       ></div>
 
@@ -662,7 +832,7 @@ const CustomerRides: React.FC = () => {
   // --- ACTION HANDLERS ---
 
   /**
-   * 4. Invoke Handler (Download CSV)
+   * 4. Invoke Handler (Download Receipt/Ticket)
    */
   const handleInvokeDownload = useCallback((ride: Ride) => {
     if (ride.tripStatus !== "Trip Completed") {
@@ -671,42 +841,206 @@ const CustomerRides: React.FC = () => {
     }
 
     const detail = ride.detailData;
+    const currentDate = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-    // Data structure for the CSV download (flattening the detail data)
-    const csvData = [
-      ["Field", "Value"],
-      ["Booking ID", ride.bookingId],
-      ["Rider Name", detail.riderInfo.name],
-      ["Rider Phone", detail.riderInfo.phone],
-      ["Driver Name", detail.driverInfo.name],
-      ["Driver Phone", detail.driverInfo.phone],
-      ["Vehicle Number", detail.vehicleInfo.number],
-      ["Vehicle Model", detail.vehicleInfo.makeModel],
-      ["Vehicle Type", detail.vehicleInfo.vehicleType],
-      ["Trip Status", detail.rideDetails.status],
-      ["Start Time", detail.rideDetails.startTime],
-      ["End Time", detail.rideDetails.endTime],
-      ["Starting Location", detail.rideDetails.starting],
-      ["Ending Location", detail.rideDetails.endedAt],
-      ["Time (Minutes)", detail.rideDetails.timeMinutes],
-      ["Distance (Km)", detail.rideDetails.distanceKm],
-      ["Coupon Used", detail.rideDetails.coupon],
-      ["Net Ride Fare", `$${detail.fareSummary.netRideFare}`],
-      ["Total Bill", `$${detail.fareSummary.totalBill}`],
-    ];
+    // Professional HTML Receipt/Ticket Template with EcoGo Branding
+    const receiptHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>EcoGo Ride Receipt - ${ride.bookingId}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+    .receipt { max-width: 400px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #008236 0%, #006b2d 100%); color: white; padding: 24px; text-align: center; }
+    .logo { font-size: 28px; font-weight: bold; margin-bottom: 4px; }
+    .logo span { color: #90EE90; }
+    .subtitle { font-size: 12px; opacity: 0.9; letter-spacing: 1px; }
+    .ticket-id { background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; display: inline-block; margin-top: 12px; font-size: 13px; font-weight: 600; }
+    .content { padding: 24px; }
+    .section { margin-bottom: 20px; }
+    .section-title { font-size: 10px; font-weight: 700; color: #008236; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #e5e7eb; }
+    .route { display: flex; gap: 12px; }
+    .route-line { display: flex; flex-direction: column; align-items: center; padding-top: 4px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-green { background: #008236; }
+    .dot-black { background: #1f2937; }
+    .line { width: 2px; flex: 1; background: #d1d5db; margin: 4px 0; min-height: 30px; }
+    .route-info { flex: 1; }
+    .route-point { margin-bottom: 12px; }
+    .route-label { font-size: 10px; font-weight: 600; color: #008236; text-transform: uppercase; }
+    .route-address { font-size: 13px; color: #374151; margin-top: 2px; }
+    .route-time { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .info-item { background: #f9fafb; padding: 10px 12px; border-radius: 8px; }
+    .info-label { font-size: 10px; color: #9ca3af; text-transform: uppercase; font-weight: 600; }
+    .info-value { font-size: 13px; color: #1f2937; font-weight: 500; margin-top: 2px; }
+    .fare-box { background: #008236; color: white; border-radius: 10px; padding: 16px; }
+    .fare-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+    .fare-row.total { border-top: 1px solid rgba(255,255,255,0.3); margin-top: 8px; padding-top: 12px; font-size: 16px; font-weight: 700; }
+    .fare-label { color: rgba(255,255,255,0.8); }
+    .fare-row.total .fare-label { color: white; }
+    .footer { background: #f9fafb; padding: 16px 24px; text-align: center; border-top: 1px solid #e5e7eb; }
+    .footer-text { font-size: 11px; color: #6b7280; }
+    .footer-text strong { color: #374151; }
+    .qr-placeholder { width: 60px; height: 60px; background: #e5e7eb; margin: 0 auto 8px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #9ca3af; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; background: #e6f5ec; color: #008236; }
+    .discount { color: #90EE90; }
+    @media print { body { background: white; padding: 0; } .receipt { box-shadow: none; } }
+  </style>
+</head>
+<body>
+  <div class="receipt">
+    <div class="header">
+      <div class="logo">Eco<span>Go</span></div>
+      <div class="subtitle">RIDE RECEIPT</div>
+      <div class="ticket-id">${ride.bookingId}</div>
+    </div>
+    
+    <div class="content">
+      <div class="section">
+        <div class="section-title">Trip Route</div>
+        <div class="route">
+          <div class="route-line">
+            <div class="dot dot-green"></div>
+            <div class="line"></div>
+            <div class="dot dot-black"></div>
+          </div>
+          <div class="route-info">
+            <div class="route-point">
+              <div class="route-label">Pickup</div>
+              <div class="route-address">${detail.rideDetails.starting}</div>
+              <div class="route-time">${detail.rideDetails.startTime}</div>
+            </div>
+            <div class="route-point">
+              <div class="route-label" style="color: #374151;">Dropoff</div>
+              <div class="route-address">${detail.rideDetails.endedAt}</div>
+              <div class="route-time">${detail.rideDetails.endTime}</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    const csvContent = csvData.map((e) => e.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      <div class="section">
+        <div class="section-title">Trip Details</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Distance</div>
+            <div class="info-value">${detail.rideDetails.distanceKm} km</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Duration</div>
+            <div class="info-value">${detail.rideDetails.timeMinutes} min</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Ride Type</div>
+            <div class="info-value">${ride.type}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Status</div>
+            <div class="info-value"><span class="badge">Completed</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Rider</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Name</div>
+            <div class="info-value">${detail.riderInfo.name}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Phone</div>
+            <div class="info-value">${detail.riderInfo.phone}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Driver & Vehicle</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Driver</div>
+            <div class="info-value">${detail.driverInfo.name}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Phone</div>
+            <div class="info-value">${detail.driverInfo.phone}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Vehicle</div>
+            <div class="info-value">${detail.vehicleInfo.makeModel}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Plate</div>
+            <div class="info-value">${detail.vehicleInfo.number}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Payment Summary</div>
+        <div class="fare-box">
+          <div class="fare-row">
+            <span class="fare-label">Base Fare</span>
+            <span>$${detail.fareSummary.netRideFare.toFixed(2)}</span>
+          </div>
+          ${
+            detail.rideDetails.coupon !== "~NA~"
+              ? `
+          <div class="fare-row">
+            <span class="fare-label">Coupon (${detail.rideDetails.coupon})</span>
+            <span class="discount">-$5.00</span>
+          </div>
+          `
+              : ""
+          }
+          <div class="fare-row">
+            <span class="fare-label">Payment Method</span>
+            <span>${ride.transaction.paymentMethod}</span>
+          </div>
+          <div class="fare-row total">
+            <span class="fare-label">Total Paid</span>
+            <span>$${detail.fareSummary.totalBill.toFixed(2)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="qr-placeholder">QR</div>
+      <div class="footer-text">
+        <strong>Thank you for riding with EcoGo!</strong><br>
+        Receipt generated on ${currentDate}<br>
+        Booking ID: ${ride.bookingId} | Ride ID: ${ride.id}
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+
+    // Create and download the HTML file
+    const blob = new Blob([receiptHTML], { type: "text/html;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `ride_details_${ride.id}.csv`);
+    link.setAttribute("download", `EcoGo_Receipt_${ride.bookingId}.html`);
     link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 
-    console.log(`Successfully invoked/downloaded CSV for ride: ${ride.id}`);
+    console.log(`Successfully downloaded receipt for ride: ${ride.id}`);
   }, []);
 
   /**
@@ -885,79 +1219,121 @@ const CustomerRides: React.FC = () => {
           <h2 className="mb-4 text-lg font-semibold text-gray-800">
             List of ride requests accepted by drivers
           </h2>
-          <div className="overflow-x-auto shadow-md rounded-lg">
+          <div className="overflow-x-auto shadow-md rounded-lg border border-gray-200">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className={`bg-${BRAND_GREEN}-50`}>
+              <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Sr. no
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">
                     Booking ID
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Rider Details
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">
+                    Rider
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Driver Details
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">
+                    Driver
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Vehicle Details
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">
+                    Vehicle
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Booked Time
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">
+                    Pickup Time
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                    Trip Status
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">
+                    Dropoff Time
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">
                     Type
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase">
                     Action
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-100">
                 {paginatedRides.map((ride) => (
                   <tr key={ride.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {ride.srNo}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-4 py-3 text-sm font-mono font-bold text-gray-900">
                       {ride.id}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                      <div className="font-semibold">{ride.rider.name}</div>
-                      <div className="text-xs text-gray-500">
+                    <td className="px-4 py-3">
+                      <p className="text-xs text-gray-900">
+                        <span className="font-bold">N:</span> {ride.rider.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        <span className="font-bold text-gray-700">P:</span>{" "}
                         {ride.rider.phone}
-                      </div>
+                      </p>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                      <div className="font-semibold">{ride.driver.name}</div>
-                      <div className="text-xs text-gray-500">
+                    <td className="px-4 py-3">
+                      <p className="text-xs text-gray-900">
+                        <span className="font-bold">N:</span> {ride.driver.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        <span className="font-bold text-gray-700">P:</span>{" "}
                         {ride.driver.phone}
-                      </div>
+                      </p>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                      <div className="font-semibold">{ride.vehicle.number}</div>
-                      <div className="text-xs text-gray-500">
+                    <td className="px-4 py-3">
+                      <p className="text-xs text-gray-900">
+                        <span className="font-bold">N:</span>{" "}
                         {ride.vehicle.makeModel}
-                      </div>
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        <span className="font-bold text-gray-700">P:</span>{" "}
+                        {ride.vehicle.number}
+                      </p>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                      <div className="font-semibold">{ride.bookedDate}</div>
-                      <div className="text-xs text-gray-500">
-                        {ride.bookedTime}
-                      </div>
+                    <td className="px-2 py-3">
+                      {ride.tripStatus === "Trip Started" ||
+                      ride.tripStatus === "Trip Completed" ? (
+                        <span className="text-xs text-gray-900 font-medium">
+                          {ride.detailData.rideDetails.startTime}
+                        </span>
+                      ) : ride.tripStatus === "Cancelled by rider" ? (
+                        <span className="text-xs text-orange-600/80">
+                          No pickup
+                        </span>
+                      ) : ride.tripStatus === "Cancelled by driver" ? (
+                        <span className="text-xs text-red-600/80">
+                          No pickup
+                        </span>
+                      ) : (
+                        <span className="text-xs text-amber-600 font-medium">
+                          Pending
+                        </span>
+                      )}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                    <td className="px-4 py-3">
+                      {ride.tripStatus === "Trip Completed" ? (
+                        <span className="text-xs text-gray-900 font-medium">
+                          {ride.detailData.rideDetails.endTime}
+                        </span>
+                      ) : ride.tripStatus === "Trip Started" ? (
+                        <span className="text-xs text-blue-600 font-medium">
+                          In Transit
+                        </span>
+                      ) : ride.tripStatus === "Cancelled by rider" ? (
+                        <span className="text-xs text-orange-600/80">
+                          Rider cancelled
+                        </span>
+                      ) : ride.tripStatus === "Cancelled by driver" ? (
+                        <span className="text-xs text-red-600/80">
+                          Driver cancelled
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-500">Awaiting</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
                       <StatusBadge status={ride.tripStatus} />
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                    <td className="px-4 py-3 text-xs text-gray-700">
                       {ride.type}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-4 py-3 text-center">
                       <ActionMenu
                         ride={ride}
                         onAction={(action) => handleAction(action, ride)}

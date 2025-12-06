@@ -199,7 +199,7 @@ export const menuItems: MenuItem[] = [
       // },
       { id: "ride", label: "Ride Dashboard" },
       { id: "ride/ride-requests", label: "Ride Requests" },
-      // { id: "ride/customer-rides", label: "Customer Rides" },
+      { id: "ride/customer-rides", label: "Customer Rides" },
 
       // { id: "ride/pending", label: "Pending Rides" },
       // { id: "ride/scheduled", label: "Scheduled Rides" },
